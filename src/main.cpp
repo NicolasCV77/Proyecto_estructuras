@@ -6,17 +6,30 @@ struct Comando {
     string nombre;
     string description;
     string exito;
-    sting error;
+    string error;
 };
+
+void comando_ayuda();
+void comando_cargar();
+void comando_listar_secuencias();
+void comando_histograma();
+void comando_subsecuencia();
+void comando_enmascarar();
+void comando_guardar();
+void comando_cofificr();
+void comando_decodificar();
+void comando_ruta_mas_corta();
+void comando_base_remota();
+void comando_salir();
 
 
 int main() {
     setlocale(LC_ALL, "");
     string linea;
 
-    cout << "\t\t\t  - - - - - - - - - - - - - - - - -" << endl;
+    cout << "\t\t\t  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     cout << "\t\t\t  |          FASTA - TOOL         |" << endl;
-    cout << "\t\t\t  - - - - - - - - - - - - - - - - -" << endl;
+    cout << "\t\t\t  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     cout << "\t By Mafe Cruz, Nicolas Castaneda & Daniel Ortiz" << endl;
 
     cout << " - Bienvenid@! -" << endl << " - Escribe 'ayuda' para ver los comandos disponibles -" << endl;
@@ -67,11 +80,11 @@ int main() {
                 cout << "" << endl;
             break;
 
-            case "base_remota":
+            case "ruta_mas_corta":
                 cout << "" << endl;
             break;
 
-            case "ruta_mas_corta":
+            case "base_remota":
                 cout << "" << endl;
             break;
 

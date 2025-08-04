@@ -4,11 +4,9 @@ using namespace std;
 
 struct Comando {
     string nombre;
-<<<<<<< HEAD
     string description;
     string exito;
     string error;
-=======
     string descripccion;
     int argumentos;
 };
@@ -26,9 +24,9 @@ Comando comandos[] = {
     {"ruta_mas_corta", "", 1},
     {"base_remota", "", 1},
     {"salir", "", 0},
->>>>>>> 45c4decd80ec6655792f63ee0b4413f41ccd59d1
 };
 
+//declaración de funciones
 void comando_ayuda();
 void comando_cargar();
 void comando_listar_secuencias();
@@ -119,4 +117,53 @@ int main() {
             break;
         }
     }
+}
+
+//implementación de funciones
+void comando_ayuda()
+{
+}
+
+void comando_cargar()
+{
+}
+
+void comando_listar_secuencias()
+{
+}
+
+void comando_histograma()
+{
+}
+
+void comando_subsecuencia()
+{
+}
+
+void comando_enmascarar()
+{
+}
+
+void comando_guardar()
+{
+}
+
+void comando_cofificr()
+{
+}
+
+void comando_decodificar()
+{
+}
+
+void comando_ruta_mas_corta()
+{
+}
+
+void comando_base_remota()
+{
+}
+
+void comando_salir()
+{
 }

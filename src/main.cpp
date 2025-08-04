@@ -5,25 +5,23 @@ using namespace std;
 struct Comando {
     string nombre;
     string description;
-    string exito;
-    string error;
     string descripccion;
     int argumentos;
 };
 
 Comando comandos[] = {
-    {"ayuda", "", 1},
-    {"cargar", "", 1},
-    {"listar_secuencias", "", 0},
-    {"histograma", "", 1},
-    {"es_subsecuencia", "", 2},
-    {"enmasacarar", "", 1},
-    {"guardar", "", 1},
-    {"codificar", "", 1},
-    {"decodificar", "", 1},
-    {"ruta_mas_corta", "", 1},
-    {"base_remota", "", 1},
-    {"salir", "", 0},
+    {"ayuda", "Muestra todos los comandos", 1},
+    {"cargar", "Carga los datos contenidos en el archivo", 1},
+    {"listar_secuencias", "Lista la cantidad de secuencias", 0},
+    {"histograma", "Imprime el histograma de una secuencia", 1},
+    {"es_subsecuencia", "Determina si una subsecuencia existe", 2},
+    {"enmasacarar", "Enmascara una subsecuencia dada", 1},
+    {"guardar", "Guarda las secuencias en el archivo", 1},
+    {"codificar", "Genera el archivo binario", 1},
+    {"decodificar", "Cargar las secuencias en el archivo binario", 1},
+    {"ruta_mas_corta", "Calcula ruta más corta", 1},
+    {"base_remota", "Busca la ubicación de la misma base", 1},
+    {"salir", "Termina la ejecución de la aplicación", 0},
 };
 
 //declaración de funciones
@@ -34,7 +32,7 @@ void comando_histograma();
 void comando_subsecuencia();
 void comando_enmascarar();
 void comando_guardar();
-void comando_cofificr();
+void comando_cofificar();
 void comando_decodificar();
 void comando_ruta_mas_corta();
 void comando_base_remota();
@@ -148,7 +146,7 @@ void comando_guardar()
 {
 }
 
-void comando_cofificr()
+void comando_cofificar()
 {
 }
 

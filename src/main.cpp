@@ -4,9 +4,23 @@ using namespace std;
 
 struct Comando {
     string nombre;
-    string description;
-    string exito;
-    sting error;
+    string descripccion;
+    int argumentos;
+};
+
+Comando comandos[] = {
+    {"ayuda", "", 1},
+    {"cargar", "", 1},
+    {"listar_secuencias", "", 0},
+    {"histograma", "", 1},
+    {"es_subsecuencia", "", 2},
+    {"enmasacarar", "", 1},
+    {"guardar", "", 1},
+    {"codificar", "", 1},
+    {"decodificar", "", 1},
+    {"ruta_mas_corta", "", 1},
+    {"base_remota", "", 1},
+    {"salir", "", 0},
 };
 
 

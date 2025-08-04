@@ -4,12 +4,7 @@ using namespace std;
 
 struct Comando {
     string nombre;
-<<<<<<< HEAD
-    string description;
-    string exito;
-    string error;
-=======
-    string descripccion;
+    string descriccion;
     int argumentos;
 };
 
@@ -25,8 +20,7 @@ Comando comandos[] = {
     {"decodificar", "", 1},
     {"ruta_mas_corta", "", 1},
     {"base_remota", "", 1},
-    {"salir", "", 0},
->>>>>>> 45c4decd80ec6655792f63ee0b4413f41ccd59d1
+    {"salir", "", 0}
 };
 
 void comando_ayuda();

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "menu.h"
-#include "menu.cpp"
 int main(){
     // Muestra el menu
     imprimir_menu();

@@ -1,7 +1,8 @@
 #include "menu.h"
+#include <iomanip>
 
 Comando comandos[] = {
-    {comando_ayuda, "ayuda", 1, "Muestra todos los comandos.", "ayuda <comando>"},
+    {comando_ayuda, "ayuda", 0, "Muestra todos los comandos.", "ayuda <comando>"},
     {comando_cargar, "cargar", 1, "Carga los datos contenidos en el archivo.", "cargar <archivo>"},
     {comando_listar_secuencias, "listar_secuencias", 0, "Lista la cantidad de secuencias.", "listar_secuencias"},
     {comando_histograma, "histograma", 1, "Imprime el histograma de una secuencia.", "histograma <id>"},
@@ -92,6 +93,17 @@ void imprimir_menu(){
 // Implementacion de funciones.
 void comando_ayuda(const string& arg1, const string&)
 {
+    if(arg1 == ""){
+        printf("~~~~~~~~~~~~~~~~~~~ Lista de comandos ~~~~~~~~~~~~~~~~~~~\n");
+        for(int i = 0; i<numComandos; i++){
+            cout<<left<<comandos[i].nombre<< setw(20) <<"\t"<<comandos[i].descripcion<<"\n";
+        }
+        printf("\nSi desea ayuda con un comando especifico coloque ayuda <comando>");
+    }else{
+        for(int i = 0; i<numComandos; i++){
+
+        }
+    }
 }
 
 void comando_cargar(const string& arg1, const string&)

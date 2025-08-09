@@ -2,6 +2,15 @@
 #include "menu.h"
 #include <fstream>
 
+// Estructura de Comando.
+struct Comando {
+    ComandoFuncion funcion;
+    string nombre;
+    int argumentos;
+    string descripcion;
+    string uso; 
+};
+
 Comando comandos[] = {
     {comando_ayuda, "ayuda", 0, "Muestra todos los comandos.", "ayuda"},
     {comando_cargar, "cargar", 1, "Carga los datos contenidos en el archivo.", "cargar <archivo>"},

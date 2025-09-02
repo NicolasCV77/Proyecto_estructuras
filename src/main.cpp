@@ -1,9 +1,9 @@
 #include <iostream>
 #include "menu.h"
-#include "menu.cpp"
+#include "comando.h"
 int main(){
     // Muestra el menu
-    imprimir_menu();
+    Menu();
     // Finaliza la ejecucion del programa.
     return 0;
 }

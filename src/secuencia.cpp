@@ -56,7 +56,7 @@ int Secuencia::esSubsecuencia(string subsecuencia) {
     }
 
     vector<char>::iterator it;
-    int contador;
+    int contador = 0;
 
     for (it = bases.begin(); it <= bases.end() - subsecuencia.size(); it++) {
         if (equal(subsecuencia.begin(), subsecuencia.end(), it)) {

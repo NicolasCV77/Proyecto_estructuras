@@ -92,7 +92,7 @@ void Menu::inicializarComandos() {
         Comando(comandoCargar, "cargar", 1, "Carga los datos contenidos en el archivo.", "cargar nombre_archivo"),
         Comando(comandoListarSecuencias, "listar_secuencias", 0, "Lista la cantidad de secuencias.", "listar_secuencias"),
         Comando(comandoHistograma, "histograma", 1, "Imprime el histograma de una secuencia.", "histograma descripcion_secuencia"),
-        Comando(comandoSubsecuencia, "subsecuencia", 2, "Determina si una subsecuencia existe.", "es_subsecuencia subsecuencia"),
+        Comando(comandoSubsecuencia, "subsecuencia", 1, "Determina si una subsecuencia existe.", "es_subsecuencia subsecuencia"),
         Comando(comandoEnmascarar, "enmascarar", 1, "Enmascara una subsecuencia dada.", "enmascarar subsecuencia"),
         Comando(comandoGuardar, "guardar", 1, "Guarda las secuencias en el archivo.", "guardar nombre_archivo"),
         Comando(comandoCodificar, "codificar", 1, "Codifica las secuencias en formato binario (.fabin).", "codificar nombre_archivo.fabin"), 
@@ -140,7 +140,7 @@ void Menu::comandoHistograma(const string& arg1, const string&) {
 }
 
 // Determinar si es subsecuencia dado un string.
-void Menu::comandoSubsecuencia(const string& arg1, const string& arg2) {
+void Menu::comandoSubsecuencia(const string& arg1, const string&) {
     fasta.contarSubsecuencia(arg1);
 }
 

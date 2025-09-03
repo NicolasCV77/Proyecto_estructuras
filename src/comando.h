@@ -9,27 +9,26 @@ using namespace std;
 typedef void (*ComandoFuncion)(const string&, const string&);
 
 class Comando {
-private:
+    private:
+        ComandoFuncion accion; 
+        string nombre;
+        int argumentos;
+        string descripcion;
+        string uso;
+        
+    public:
+        // Constructor.
+        Comando(ComandoFuncion accion, const string& nombre, int argumentos, const string& descripcion, const string& uso);
 
-    ComandoFuncion accion;
-    string nombre;
-    int argumentos;
-    string descripcion;
-    string uso;
-    
-    
-public:
-    // Constructor
-    Comando(ComandoFuncion accion, const string& nombre, int argumentos, const string& descripcion, const string& uso);
+        // Métodos de acceso.
+        string getNombre();
+        string getDescripcion();
+        string getUso();
+        int getArgumentos();
 
-    // Métodos de acceso
-    string getNombre();
-    string getDescripcion();
-    string getUso();
-    int getArgumentos();
-
-    // Ejecutar.
-    void ejecutar(const string& arg1, const string& arg2);
+        // Ejecutar.
+        void ejecutar(const string& arg1, const string& arg2);
+        
 };
 
 #endif

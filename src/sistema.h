@@ -8,18 +8,20 @@
 using namespace std;
 
 class Sistema {
-private:
-    FASTA fasta;
-public:
-    // Constructor.
-    Sistema();
+    private:
+        FASTA fasta;
 
-    // Manejo de archivos.
-    bool cargarArchivo(string nombreArchivo);
-    bool guardarArchivo(string nombreArchivo);
+    public:
+        // Constructor.
+        Sistema();
 
-    // Acceso al objeto FASTA.
-    FASTA& getFASTA();
+        // Manejo de archivos.
+        void cargarArchivo(string nombreArchivo);
+        void guardarArchivo(string nombreArchivo);
+
+        // Acceso al objeto FASTA.
+        FASTA& getFASTA();
+        
 };
 
 #endif

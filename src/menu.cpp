@@ -1,19 +1,24 @@
-#include "menu.h"
-#include "comando.h"
+#include <iostream>
 #include <fstream>
-#include "FASTA.h"
-#include <iomanip>
+#include <iomanip> 
 #include <cstring>
 
+#include "menu.h"
+#include "comando.h"
+#include "sistema.h"
+#include "FASTA.h"
 
 vector<Comando> Menu::comandos;
-FASTA f;
-//
-Menu::Menu(){
+Sistema sistema;
+FASTA& fasta = sistema.getFASTA();
+
+// Constructor.
+Menu::Menu() {
     inicializarComandos();
     imprimirMenu();
 }
-// Registrar comandos en el menú
+
+// Registrar comandos en el menú.
 void Menu::imprimirMenu() {
     char linea[200];
 
@@ -25,14 +30,14 @@ void Menu::imprimirMenu() {
     cout << " - Bienvenid@! -" << endl << " - Escribe 'ayuda' para ver los comandos disponibles -" << endl;
 
     while (true) {
-        cout << "$ ";
+        cout << endl << "$ ";
 
         if (!cin.getline(linea, sizeof(linea))) 
             break;
         if (strlen(linea) == 0) 
             continue;
 
-        // Tokeniza la línea de entrada
+        // Tokeniza la línea de entrada.
         char* token = strtok(linea, " ");
         char* a1 = strtok(nullptr, " ");
         char* a2 = strtok(nullptr, " ");
@@ -50,6 +55,7 @@ void Menu::imprimirMenu() {
             arg1 = string(a1);
             argc++;
         }
+
         if (a2 != nullptr) {
             arg2 = string(a2);
             argc++;
@@ -79,7 +85,7 @@ void Menu::imprimirMenu() {
     }
 }
 
-//implementación de funcion ayuda
+// Implementación para inicializar todos los comandos.
 void Menu::inicializarComandos() {
     comandos = {
         Comando(comandoAyuda, "ayuda", 0, "Muestra todos los comandos.", "ayuda"),
@@ -94,10 +100,11 @@ void Menu::inicializarComandos() {
     };
 }
 
+// Implementación del comando ayuda.
 void Menu::comandoAyuda(const string& arg1, const string& arg2) {
-    //valida argumentos
+    // Validar argumentos.
     if (arg1.empty()) {
-        cout << "Comandos disponibles:\n";
+        cout << "Comandos disponibles: " << endl;
         vector <Comando>::iterator it;
         for (it = comandos.begin(); it != comandos.end();it++) {
             cout << " - " << it->getNombre() << ": " << it->getDescripcion() << endl;
@@ -114,54 +121,37 @@ void Menu::comandoAyuda(const string& arg1, const string& arg2) {
     }
 }
 
-void Menu::comandoCargar(const string& arg1, const string& arg2) 
-{
-    ifstream archivo(arg1);
-    if (!archivo.is_open()) {
-        cout << "[ERROR] '" << arg1 << "' no se encuentra o no puede leerse." << endl;
-        return;
-    }
-
-    int secuencias = 0;
-    string linea;
-    while (getline(archivo, linea)) {
-        if (!linea.empty()) secuencias++;
-    }
-    archivo.close();
-
-    cout << "[OK] " << secuencias << " secuencias cargadas desde " << arg1 << "." << endl;
+// Cargar un archivo.
+void Menu::comandoCargar(const string& arg1, const string& arg2) {
+    sistema.cargarArchivo(arg1);
 }
 
+// Listar el conjunto de secuencias.
 void Menu::comandoListarSecuencias(const string&, const string&) {
-    f.listarSecuencias();
+    fasta.listarSecuencias();
 }
 
+// Mostrar histograma por secuencia.
 void Menu::comandoHistograma(const string& arg1, const string&) {
-    f.histograma(arg1);
+    fasta.histograma(arg1);
 }
 
+// Determinar si es subsecuencia dado un string.
 void Menu::comandoSubsecuencia(const string& arg1, const string& arg2) {
-    f.contarSubsecuencia(arg1);
+    fasta.contarSubsecuencia(arg1);
 }
 
+// Enmascarar la secuencia.
 void Menu::comandoEnmascarar(const string& arg1, const string&) {
-    f.enmascararSubsecuencia(arg1);
+    fasta.enmascararSubsecuencia(arg1);
 }
 
+// Guardar las secuencias en un archivo .fa
 void Menu::comandoGuardar(const string& arg1, const string&) {
-    if (arg1.empty()) {
-        cout << "[ERROR] Uso: guardar <archivo>" << endl;
-        return;
-    }
-    ofstream archivo(arg1);
-    if (!archivo.is_open()) {
-        cout << "[ERROR] No se pudo guardar en '" << arg1 << "'" << endl;
-        return;
-    }
-    archivo.close();
-    cout << "[OK] Secuencias guardadas en " << arg1 << "." << endl;
+    sistema.guardarArchivo(arg1);
 }
 
+// Encontrar la ruta más corta entre secuencias.
 void Menu::comandoRutaMasCorta(const string& arg1, const string& arg2) {
     if (arg1.empty() || arg2.empty()) {
         cout << "[ERROR] Uso: ruta_mas_corta <seq1> <seq2>" << endl;
@@ -171,6 +161,7 @@ void Menu::comandoRutaMasCorta(const string& arg1, const string& arg2) {
     cout << "[OK] Ruta más corta entre '" << arg1 << "' y '" << arg2 << "': " << distancia << " pasos" << endl;
 }
 
+// Salir del programa.
 void Menu::comandoSalir(const string&, const string&) {
     cout << "[OK] Saliendo del programa..." << endl;
     exit(0);

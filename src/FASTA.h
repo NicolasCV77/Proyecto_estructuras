@@ -9,26 +9,28 @@
 using namespace std;
 
 class FASTA {
-private:
-    // Conjunto de secuencias cargadas.
-    vector<Secuencia> secuencias;
-    vector <char> componentes;
-public:
-    // Constructor.
-    FASTA();
+    private:
+        // Conjunto de secuencias cargadas.
+        vector<Secuencia> secuencias;
+        vector <char> componentes;
+        
+    public:
+        // Constructor.
+        FASTA();
 
-    // Gestión de secuencias.
-    void agregarSecuencia(const Secuencia& secuencia);
-    int totalSecuencias();
+        // Gestión de secuencias.
+        void agregarSecuencia(const Secuencia& secuencia);
+        int totalSecuencias();
 
-    // Operaciones principales.
-    void listarSecuencias();
-    void histograma(string descripcion);  
-    void contarSubsecuencia(string sub);
-    void enmascararSubsecuencia(string sub);
+        // Operaciones principales.
+        void listarSecuencias();
+        void histograma(string descripcion);  
+        void contarSubsecuencia(string sub);
+        void enmascararSubsecuencia(string sub);
 
-    // Acceso directo.
-    vector<Secuencia> getSecuencias();
+        // Acceso directo.
+        vector<Secuencia> getSecuencias();
+        
 };
 
 #endif

@@ -11,13 +11,13 @@ using namespace std;
 class Menu {
     private:
         // Lista de comandos registrados.
-        static vector <Comando> comandos;   // lista de comandos registrados
+        static vector <Comando> comandos;
 
     public:
         // Constructor.
         Menu();
 
-        //Imprime el menu
+        //Imprime el menú.
         void imprimirMenu();
 
         // Registrar un comando.

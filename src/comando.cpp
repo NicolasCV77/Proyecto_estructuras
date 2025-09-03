@@ -1,7 +1,8 @@
-#include "comando.h"
 #include <fstream>
-
-Comando::Comando(ComandoFuncion accion, const string& nombre, int argumentos, const string& descripcion, const string& uso){
+#include "comando.h"
+ 
+// Constructor Comando.
+Comando::Comando(ComandoFuncion accion, const string& nombre, int argumentos, const string& descripcion, const string& uso) {
     this->accion = accion;
     this->nombre = nombre;
     this->argumentos = argumentos;
@@ -9,20 +10,23 @@ Comando::Comando(ComandoFuncion accion, const string& nombre, int argumentos, co
     this->uso = uso;
 }
 
-
-string Comando::getNombre(){
+string Comando::getNombre() {
     return nombre;
 }
-string Comando::getDescripcion(){
+
+string Comando::getDescripcion() {
     return descripcion;
 }
-string Comando::getUso(){
+
+string Comando::getUso() {
     return uso;
 }
-int Comando::getArgumentos(){
+
+int Comando::getArgumentos() {
     return argumentos;
 } 
-void Comando::ejecutar(const string& arg1, const string& arg2){
+
+void Comando::ejecutar(const string& arg1, const string& arg2) {
     if (accion != nullptr) {
         accion(arg1, arg2);
     }

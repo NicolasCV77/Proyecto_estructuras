@@ -12,7 +12,7 @@ class FASTA {
     private:
         // Conjunto de secuencias cargadas.
         vector<Secuencia> secuencias;
-        vector <char> componentes;
+        vector<char> componentes;
         
     public:
         // Constructor.

@@ -88,3 +88,32 @@ vector<string> Secuencia::formatoFASTA() {
 
     return lineas;
 }
+
+int Secuencia::ContarExactas(){
+    int bases = 0;
+    componentesExactos = {
+        'A', 'C', 'G', 'T', 'U' 
+    };
+    vector<char>:: iterator itComponentes;
+    for(itComponentes = componentesExactos.begin(); itComponentes != componentesExactos.end(); itComponentes++){
+        if(contarBase(*itComponentes)>0){
+            bases++;
+        }
+    }
+    return bases;
+}
+
+int Secuencia::ContarNoExactas(){
+    int bases = 0;
+    vector<char>:: iterator itComponentes;
+    componentesNoExactos = {
+        'R', 'Y','K', 'M', 'S', 'W', 'B', 'D', 'H',
+        'V', 'N', 'X', '-'
+    };
+    for(itComponentes = componentesNoExactos.begin(); itComponentes != componentesNoExactos.end(); itComponentes++){
+        if(contarBase(*itComponentes)>0){
+            bases++;
+        }
+    }
+    return bases;
+}

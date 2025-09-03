@@ -2,8 +2,9 @@
 
 FASTA::FASTA() {
     componentes = {
-        'A', 'C', 'G', 'T', 'U', 'R', 'Y',
-        'K', 'M', 'S', 'W', 'B', 'D', 'H',
+        'A', 'C', 'G', 'T', 'U',
+        'R', 'Y','K', 'M', 'S', 
+        'W', 'B', 'D', 'H',
         'V', 'N', 'X', '-'
     };
 }
@@ -17,41 +18,34 @@ int FASTA::totalSecuencias(){
 }
 
 void FASTA::listarSecuencias() {
+    FASTA();
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas en memoria" << endl;
     } else {
         cout << "Hay " << secuencias.size() << " Cargadas en memoria" << endl;
-
         vector<Secuencia>::iterator it;
-        vector<char>:: reverse_iterator itComponentes;
-        int contiene, numeroBases;
-            
-        for (it = secuencias.begin(); it != secuencias.end(); it++) {
-            int completo = it->contarBase('-');
-
-            numeroBases = 0;
-            for (itComponentes = componentes.rbegin(); itComponentes != componentes.rend(); itComponentes++) {
-                contiene = it->contarBase(*itComponentes);
-                numeroBases++;
-            }
-
-            if (completo == 0) {
-                cout << "Secuencia" << it->getDescripcion() << "contiene " << numeroBases << "bases" << endl;
-            } else {
-                cout << "Secuencia" << it->getDescripcion() << "contiene al menos " << numeroBases << " bases" << endl;
+        for(it = secuencias.begin();it !=  secuencias.end(); it++){
+            if(it->ContarNoExactas()>0){
+                cout <<"Secuencia " << it->getDescripcion() << " contiene al menos " << it->ContarExactas() << " bases" << endl;
+            }else{
+                cout <<"Secuencia " << it->getDescripcion() << " contiene " << it->ContarExactas() << " bases" << endl;
             }
         }
     }
 } 
 
 void FASTA::histograma(string descripcion) {
+    FASTA();
     vector<Secuencia>:: iterator itSec;
     for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
         if (itSec->getDescripcion()== descripcion) {
             break;
         }
     }
-
+    if (itSec == secuencias.end()) {
+        cout << "Secuencia invalida"<< endl;
+        return;
+    }
     vector<char>::iterator it;
     int numBase;
 

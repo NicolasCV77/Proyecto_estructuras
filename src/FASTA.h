@@ -29,7 +29,7 @@ class FASTA {
         void enmascararSubsecuencia(string sub);
 
         // Acceso directo.
-        vector<Secuencia> getSecuencias();
+        vector<Secuencia>& getSecuencias();
         
 };
 

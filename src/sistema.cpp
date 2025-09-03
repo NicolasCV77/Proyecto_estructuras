@@ -86,7 +86,7 @@ void Sistema::guardarArchivo(string nombreArchivo) {
     }
 
     // Verificar secuencias cargadas.
-    vector<Secuencia> secuencias = fasta.getSecuencias();
+    vector<Secuencia>& secuencias = fasta.getSecuencias();
     if (secuencias.empty()) {
         cout << "[ERROR] No hay secuencias guardadas en memoria." << endl;
         return;

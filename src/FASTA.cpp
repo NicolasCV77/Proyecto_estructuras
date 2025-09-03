@@ -103,7 +103,6 @@ void FASTA::enmascararSubsecuencia(string sub) {
     }
 }
 
-vector<Secuencia> FASTA::getSecuencias() {
-    vector<Secuencia> n;
-    return n;
+vector<Secuencia>& FASTA::getSecuencias() {
+    return secuencias;
 }

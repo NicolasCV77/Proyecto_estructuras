@@ -22,9 +22,9 @@ Menu::Menu() {
 void Menu::imprimirMenu() {
     char linea[200];
 
-    cout << "\t~" << endl;
-    cout << "\t|          FASTA - TOOL         |" << endl;
-    cout << "\t~\t"<< endl;
+    cout << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    cout << "\t|         >>> FASTA - TOOL <<<             |" << endl;
+    cout << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     cout << endl << "By Mafe Cruz, Nicolas Castaneda & Daniel Ortiz\t" << endl;
 
     cout << " - Bienvenid@! -" << endl << " - Escribe 'ayuda' para ver los comandos disponibles -" << endl;
@@ -89,14 +89,17 @@ void Menu::imprimirMenu() {
 void Menu::inicializarComandos() {
     comandos = {
         Comando(comandoAyuda, "ayuda", 0, "Muestra todos los comandos.", "ayuda"),
-        Comando(comandoCargar, "cargar", 1, "Carga los datos contenidos en el archivo.", "cargar <archivo>"),
+        Comando(comandoCargar, "cargar", 1, "Carga los datos contenidos en el archivo.", "cargar nombre_archivo"),
         Comando(comandoListarSecuencias, "listar_secuencias", 0, "Lista la cantidad de secuencias.", "listar_secuencias"),
-        Comando(comandoHistograma, "histograma", 1, "Imprime el histograma de una secuencia.", "histograma <id>"),
-        Comando(comandoSubsecuencia, "subsecuencia", 2, "Determina si una subsecuencia existe.", "subsecuencia <id> <sub>"),
-        Comando(comandoEnmascarar, "enmascarar", 1, "Enmascara una subsecuencia dada.", "enmascarar <id>"),
-        Comando(comandoGuardar, "guardar", 1, "Guarda las secuencias en el archivo.", "guardar <archivo>"),
-        Comando(comandoRutaMasCorta, "ruta_mas_corta", 2, "Calcula ruta más corta.", "ruta_mas_corta <seq1> <seq2>"),
-        Comando(comandoSalir, "salir", 0, "Termina la ejecución de la aplicación.", "salir")
+        Comando(comandoHistograma, "histograma", 1, "Imprime el histograma de una secuencia.", "histograma descripcion_secuencia"),
+        Comando(comandoSubsecuencia, "subsecuencia", 2, "Determina si una subsecuencia existe.", "es_subsecuencia subsecuencia"),
+        Comando(comandoEnmascarar, "enmascarar", 1, "Enmascara una subsecuencia dada.", "enmascarar subsecuencia"),
+        Comando(comandoGuardar, "guardar", 1, "Guarda las secuencias en el archivo.", "guardar nombre_archivo"),
+        Comando(comandoCodificar, "codificar", 1, "Codifica las secuencias en formato binario (.fabin).", "codificar nombre_archivo.fabin"), 
+        Comando(comandoDecodificar, "decodificar", 1, "Decodifica un archivo binario .fabin a formato FASTA.", "decodificar nombre_archivo.fabin"),
+        Comando(comandoRutaMasCorta, "ruta_mas_corta", 5, "Calcula la ruta más corta entre dos posiciones de una secuencia.", "ruta_mas_corta descripcion_secuencia i j x y"),
+        Comando(comandoBaseRemota, "base_remota", 3, "Consulta la base ubicada en una posición de la secuencia.", "base_remota descripcion_secuencia i j"),
+        Comando(comandoSalir, "salir", 0, "Termina la ejecución de la aplicación.", "salir"),
     };
 }
 
@@ -165,4 +168,32 @@ void Menu::comandoRutaMasCorta(const string& arg1, const string& arg2) {
 void Menu::comandoSalir(const string&, const string&) {
     cout << "[OK] Saliendo del programa..." << endl;
     exit(0);
+}
+
+// Codificar archivo en formato binario.
+void Menu::comandoCodificar(const string& arg1, const string&) {
+    if (arg1.empty()) {
+        cout << "[ERROR] Uso: codificar nombre_archivo.fabin" << endl;
+        return;
+    }
+    cout << "[OK] Archivo '" << arg1 << "' codificado (implementación pendiente)." << endl;
+}
+
+// Decodificar archivo binario a FASTA.
+void Menu::comandoDecodificar(const string& arg1, const string&) {
+    if (arg1.empty()) {
+        cout << "[ERROR] Uso: decodificar nombre_archivo.fabin" << endl;
+        return;
+    }
+    cout << "[OK] Archivo '" << arg1 << "' decodificado (implementación pendiente)." << endl;
+}
+
+// Obtener base remota.
+void Menu::comandoBaseRemota(const string& arg1, const string& arg2) {
+    if (arg1.empty() || arg2.empty()) {
+        cout << "[ERROR] Uso: base_remota descripcion_secuencia i j" << endl;
+        return;
+    }
+    cout << "[OK] Base remota en secuencia '" << arg1 
+         << "' en posición (" << arg2 << ") (implementación pendiente)." << endl;
 }

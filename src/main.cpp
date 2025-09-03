@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "comando.h"
 
+// Programa principal.
 int main() {
     // Muestra el menú.
     Menu();

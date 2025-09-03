@@ -28,8 +28,6 @@ class Secuencia {
         int contarBase(char base);
         int enmascarar(const string& sub);
         int esSubsecuencia(string subsecuencia);
-        int ContarExactas();
-        int ContarNoExactas();
 
         // Exportar en formato FASTA.
         vector<string> formatoFASTA();

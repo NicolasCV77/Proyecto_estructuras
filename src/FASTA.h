@@ -12,7 +12,8 @@ class FASTA {
     private:
         // Conjunto de secuencias cargadas.
         vector<Secuencia> secuencias;
-        vector<char> componentes;
+        vector<vector<char>> componentes;
+        int limiteExactas;
         
     public:
         // Constructor.
@@ -28,9 +29,13 @@ class FASTA {
         void contarSubsecuencia(string sub);
         void enmascararSubsecuencia(string sub);
 
-        // Acceso directo.
-        vector<Secuencia>& getSecuencias();
+        Secuencia buscarSecuencia(string descripcion);
+        int contarPosiblesBases(Secuencia secuencia);
         
+        // Acceso directo.
+        vector<char>& getEquivalencias(char base);
+        vector<Secuencia>& getSecuencias();
+        vector<vector<char>>& getComponentes();
 };
 
 #endif

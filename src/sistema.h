@@ -3,23 +3,23 @@
 
 #include <iostream>
 #include <string>
+
 #include "FASTA.h"
 
 using namespace std;
 
+// Clase Sistema, representa el núcleo del programa.
 class Sistema {
     private:
+    // Objeto que administra las secuencias FASTA.
         FASTA fasta;
 
     public:
-        // Constructor.
-        Sistema();
-
-        // Manejo de archivos.
+        // Manejo de archivos. 
         void cargarArchivo(string nombreArchivo);
         void guardarArchivo(string nombreArchivo);
 
-        // Acceso al objeto FASTA.
+        // Referencia del objeto FASTA.
         FASTA& getFASTA();
         
 };

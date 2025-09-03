@@ -10,22 +10,27 @@ Comando::Comando(ComandoFuncion accion, const string& nombre, int argumentos, co
     this->uso = uso;
 }
 
+// Nombre del comando.
 string Comando::getNombre() {
     return nombre;
 }
 
+// Descripción del comando.
 string Comando::getDescripcion() {
     return descripcion;
 }
 
+// Forma de uso del comando.
 string Comando::getUso() {
     return uso;
 }
 
+// Cantidad de argumentos requeridos.
 int Comando::getArgumentos() {
     return argumentos;
 } 
 
+// Ejecuta la función asociada al comando.
 void Comando::ejecutar(const string& arg1, const string& arg2) {
     if (accion != nullptr) {
         accion(arg1, arg2);

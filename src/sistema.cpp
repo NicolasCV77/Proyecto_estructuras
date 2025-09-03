@@ -1,10 +1,8 @@
 #include <iostream>
 #include <fstream>
+
 #include "sistema.h"
-
-Sistema::Sistema() {
-}
-
+ 
 void Sistema::cargarArchivo(string nombreArchivo) {
     ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
@@ -129,6 +127,7 @@ void Sistema::guardarArchivo(string nombreArchivo) {
     cout << "Las secuencias han sido guardadas en '" << nombreArchivo << "'." << endl;
 }
 
+// Devuelve una referencia al objeto que pertenece al Sistema.
 FASTA& Sistema::getFASTA() {
     return fasta;
 }

@@ -3,11 +3,12 @@
 
 #include <iostream>
 #include <vector>
-#include "comando.h"
-#include "FASTA.h"
 
+#include "comando.h"
+ 
 using namespace std;
 
+// Clase Menú, representa la interfaz del usuario en consola.
 class Menu {
     private:
         // Lista de comandos registrados.
@@ -20,10 +21,10 @@ class Menu {
         //Imprime el menú.
         void imprimirMenu();
 
-        // Registrar un comando.
+        // Inicializa todos los comandos del sistema.
         void inicializarComandos();
 
-        // Mostrar todos los comandos.
+        // Comandos del menú.
         static void comandoAyuda(const string& arg1, const string& arg2);
         static void comandoCargar(const string& arg1, const string& arg2);
         static void comandoListarSecuencias(const string&, const string&);

@@ -72,6 +72,8 @@ void FASTA::histograma(string descripcion) {
 }
 
 void FASTA::contarSubsecuencia(string sub) {
+
+    
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas" << endl;
         exit(0);
@@ -110,6 +112,7 @@ void FASTA::enmascararSubsecuencia(string sub) {
         cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
     }
 }
+
 Secuencia FASTA::buscarSecuencia(string descripcion){
     vector<Secuencia> :: iterator itSec;
     for(itSec = secuencias.begin(); itSec != secuencias.end(); itSec++){
@@ -143,12 +146,11 @@ int FASTA::contarPosiblesBases(Secuencia secuencia){
         }else{
             distintas.push_back(*itBases);
         }
-
-
+    }
     return distintas.size();
 }
 
-vector<char>& FASTA::getEquivalencias(char base){
+vector<char> FASTA::getEquivalencias(char base){
     vector <char> equivalencias;
     vector <vector<char>> :: iterator itComp;
     for(itComp = componentes.begin(); itComp != componentes.end(); itComp++){

@@ -33,7 +33,7 @@ class FASTA {
         int contarPosiblesBases(Secuencia secuencia);
         
         // Acceso directo.
-        vector<char>& getEquivalencias(char base);
+        vector<char> getEquivalencias(char base);
         vector<Secuencia>& getSecuencias();
         vector<vector<char>>& getComponentes();
 };

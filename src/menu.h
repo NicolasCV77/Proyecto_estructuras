@@ -31,9 +31,12 @@ class Menu {
         static void comandoSubsecuencia(const string& arg1, const string& arg2);
         static void comandoEnmascarar(const string& arg1, const string&);
         static void comandoGuardar(const string& arg1, const string&);
+        static void comandoCodificar(const string& arg1, const string& arg2);
+        static void comandoDecodificar(const string& arg1, const string& arg2);
         static void comandoRutaMasCorta(const string& arg1, const string& arg2);
+        static void comandoBaseRemota(const string& arg1, const string& arg2);
         static void comandoSalir(const string&, const string&);
-        
+
 };
 
 #endif

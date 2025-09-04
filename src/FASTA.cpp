@@ -228,7 +228,7 @@ int FASTA::contarPosiblesBases(Secuencia secuencia) {
 
 bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int inicio) {
     vector<char>::iterator itSubsecuencia;
-    vector<vector<char>>::iterator itComponentes;
+    vector<char>::iterator itEq;
 
     int contador = 0;
     for (itSubsecuencia = subSecuencia.begin(); itSubsecuencia != subSecuencia.end(); itSubsecuencia++) {
@@ -236,37 +236,26 @@ bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int ini
         char basePatron = *itSubsecuencia;
         contador++;
 
-        // Buscar el grupo de equivalencias del basePatron
-        vector<char> grupoPatron;
-        for (itComponentes = componentes.begin(); itComponentes != componentes.end(); itComponentes++) {
-            vector<char>::iterator itEquivalencias;
-            for (itEquivalencias = itComponentes->begin(); itEquivalencias != itComponentes->end(); itEquivalencias++) {
-                if (*itEquivalencias == basePatron) {
-                    grupoPatron = *itComponentes; // copiamos el grupo completo
-                    break;
-                }
-            }
-            if (!grupoPatron.empty()) break; // ya lo encontramos
-        }
+        // Obtener las equivalencias de la base en la SECUENCIA (NO del patrón)
+        vector<char> grupoSecuencia = getEquivalencias(baseSecuencia);
 
-        // Verificar si baseSecuencia pertenece al grupoPatron
+        // Verificar si el patrón pertenece al grupo de la secuencia
         bool pertenece = false;
-        for (vector<char>::iterator itEquivalencias = grupoPatron.begin();
-             itEquivalencias != grupoPatron.end();
-             itEquivalencias++) {
-            if (*itEquivalencias == baseSecuencia) {
+        for (itEq = grupoSecuencia.begin(); itEq != grupoSecuencia.end(); itEq++) {
+            if (*itEq == basePatron) {
                 pertenece = true;
                 break;
             }
         }
 
         if (!pertenece) {
-            return false; // si alguna no coincide, ya no es subsecuencia
+            return false; // si no coincide en esta posición, no hay match
         }
     }
 
-    return true; // todas coincidieron
+    return true; // todas las posiciones coincidieron
 }
+
 
 
 vector<char> FASTA::getEquivalencias(char base){

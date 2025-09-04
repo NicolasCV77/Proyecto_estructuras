@@ -149,17 +149,6 @@ void FASTA::enmascararSubsecuencia(string sub) {
 }
 
 
-Secuencia FASTA::buscarSecuencia(string descripcion){
-    vector<Secuencia> :: iterator itSec;
-    for(itSec = secuencias.begin(); itSec != secuencias.end(); itSec++){
-        if(itSec->getDescripcion() == descripcion){
-            return *itSec;
-        }
-    }
-    cout << "No se encontro la secuencia" << endl;
-    return Secuencia("",{},0);
-}
-
 int FASTA::contarPosiblesBases(Secuencia secuencia) {
     vector<char> bases = secuencia.getBases();
     vector<char>::iterator itBases;

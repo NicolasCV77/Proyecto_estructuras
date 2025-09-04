@@ -92,33 +92,33 @@ void FASTA::histograma(string descripcion) {
 void FASTA::contarSubsecuencia(string sub) {
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas" << endl;
-        return; // mejor return en vez de exit(0)
+        return;
     }
 
-    vector<char> subSecuencia(sub.begin(), sub.end()); // convertir string a vector<char>
+    vector<char> subSecuencia(sub.begin(), sub.end());
     int siSubsecuencia = 0;
 
-    // Recorremos cada secuencia cargada
     vector<Secuencia>::iterator it;
     for (it = secuencias.begin(); it != secuencias.end(); it++) {
         vector<char> bases = it->getBases();
         int n = bases.size();
         int m = subSecuencia.size();
 
-        // revisar todas las posiciones posibles dentro de la secuencia
         for (int i = 0; i <= n - m; i++) {
-            if (subEncontrada(bases, subSecuencia, i)) {
-                siSubsecuencia++;
+            bool encontrada = subEncontrada(bases, subSecuencia, i);
+            if (encontrada) {
+                siSubsecuencia++;  // cuenta SOLO UNA VEZ el match en esa posición
             }
         }
     }
 
     if (siSubsecuencia > 0) {
-        cout << "La subsecuencia dada se repite " << siSubsecuencia<< " veces dentro de las secuencias cargadas en memoria." << endl;
+        cout << "La subsecuencia dada se repite "<< siSubsecuencia<< " veces dentro de las secuencias cargadas en memoria." << endl;
     } else {
         cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
     }
 }
+
  
 
 void FASTA::enmascararSubsecuencia(string sub) {

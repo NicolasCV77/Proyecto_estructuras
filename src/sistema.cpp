@@ -24,6 +24,7 @@ void Sistema::cargarArchivo(string nombreArchivo) {
     // Variables auxiliares.
     string linea;
     string descripcion = "";
+    vector<string> lineas;
     vector<char> bases;
     bool bandera = true;
     int ancho, secuencias = 0;
@@ -44,14 +45,35 @@ void Sistema::cargarArchivo(string nombreArchivo) {
                 cout << "[ERROR] Formato inválido... El archivo no inicia con '>'." << endl;
                 return;
             } else {
+                // Validar anchos de las líneas acumuladas
+                vector<string>::iterator itLineas;
+                for (itLineas = lineas.begin(); itLineas != lineas.end(); itLineas++) {
+                    bool esUltima = (itLineas == lineas.end() - 1);
+                    int tamano = (*itLineas).size();
+
+                    if (!esUltima) {
+                        if (tamano != ancho) {
+                            cout << "[ERROR] Ancho inválido en la secuencia '" << descripcion << "'." << endl;
+                            return;
+                        }
+                    } else {
+                        if (tamano > ancho) {
+                            cout << "[ERROR] Ancho inválido en la secuencia '" << descripcion << "'." << endl;
+                            return;
+                        }
+                    }
+                }
+                
                 // Guardar secuencia anterior.
                 Secuencia secuencia(descripcion, bases, ancho);
                 fasta.agregarSecuencia(secuencia);
                 secuencias++;
             }
+
             // Actualizar descripción y reinicar acumuladores.
             descripcion = linea.substr(1);
             bases.clear();
+            lineas.clear();
             ancho = 0;
         } else {
             // No se encontró una descripción.
@@ -59,26 +81,21 @@ void Sistema::cargarArchivo(string nombreArchivo) {
                 cout << "[ERROR] Formato inválido... El archivo no inicia con '>'." << endl;
                 return;
             }
-                
-            // Registrar ancho de la línea de la secuencia.
-            if (ancho == 0) {
+
+            // Guardar la línea
+            lineas.push_back(linea);
+
+            // Registrar ancho de la primera línea
+            if (lineas.size() == 1) {
                 ancho = linea.size();
-            } else {
-                if (linea.size() != ancho) {
-                    if (linea.size() < ancho) {
-                        // La dejamos pasar como "posible última".
-                    } else {
-                        cout << "[ERROR] Ancho inválido en la secuencia '" << descripcion << "." << endl;
-                        return;
-                    }
-                } 
             }
 
+            // Validar bases
             for (int i = 0; i < linea.size(); i++) {
                 char base = linea[i];
                 bool valida = false;
 
-                // Iterador explícito sobre los componentes
+                // Iterador sobre los componentes.
                 vector<vector<char>>::iterator itComp;
                 for (itComp = fasta.getComponentes().begin(); itComp != fasta.getComponentes().end(); itComp++) {
                     if (base == (*itComp)[0]) {
@@ -88,9 +105,8 @@ void Sistema::cargarArchivo(string nombreArchivo) {
                 }
 
                 if (!valida) {
-                    cout << "[ERROR] Base inválida '" << base 
-                        << "' encontrada en la secuencia " << descripcion << endl;
-                    return; // OJO: aborta toda la carga
+                    cout << "[ERROR] Base inválida '" << base << "' encontrada en la secuencia '" << descripcion << "'." << endl;
+                    return;
                 }
 
                 bases.push_back(base);
@@ -98,18 +114,37 @@ void Sistema::cargarArchivo(string nombreArchivo) {
         }
     }
 
+    // Validar y guardar la última secuencia si existe
     if (!descripcion.empty()) {
+        vector<string>::iterator itLineas;
+        for (itLineas = lineas.begin(); itLineas != lineas.end(); itLineas++) {
+            bool esUltima = (itLineas == lineas.end() - 1);
+            int tamano = (*itLineas).size();
+
+            if (!esUltima) {
+                if (tamano != ancho) {
+                    cout << "[ERROR] Ancho inválido en la secuencia '" << descripcion << "'." << endl;
+                    return;
+                }
+            } else {
+                if (tamano > ancho) {
+                    cout << "[ERROR] Ancho inválido en la secuencia '" << descripcion << "'." << endl;
+                    return;
+                }
+            }
+        }
+
         Secuencia secuencia(descripcion, bases, ancho);
         fasta.agregarSecuencia(secuencia);
         secuencias++;
     }
 
     if (secuencias == 0) {
-        cout << nombreArchivo << " no contiene ninguna secuencia." << endl;  
+        cout << "[ERROR] '"<< nombreArchivo << "' no contiene ninguna secuencia." << endl;  
     } else if (secuencias == 1) {
-        cout << "[OK] 1 secuencia cargada correctamente desde " << nombreArchivo << "." << endl; 
+        cout << "[OK] 1 secuencia cargada correctamente desde '" << nombreArchivo << "'." << endl; 
     } else {
-        cout << "[OK] " << secuencias << " secuencias cargadas desde " << nombreArchivo << "." << endl;
+        cout << "[OK] " << secuencias << " secuencias cargadas desde '" << nombreArchivo << "'." << endl;
     }
     
     archivo.close();

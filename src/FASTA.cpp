@@ -35,11 +35,11 @@ int FASTA::totalSecuencias(){
 
 void FASTA::listarSecuencias() {
     if (secuencias.empty()) {
-        cout << "No hay secuencias cargadas en memoria" << endl;
+        cout << "No hay secuencias cargadas en memoria." << endl;
         return;
     }
 
-    cout << "Hay " << secuencias.size() << " cargadas en memoria" << endl;
+    cout << "Hay " << secuencias.size() << " cargadas en memoria." << endl;
 
     vector<Secuencia>::iterator itSec;
     for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
@@ -59,7 +59,7 @@ void FASTA::listarSecuencias() {
         }
 
         if (tieneNoExactas) {
-            cout << "Secuencia " << itSec->getDescripcion()<< " contiene AL MENOS " << numBases << " bases." << endl;
+            cout << "Secuencia " << itSec->getDescripcion()<< " contiene al menos " << numBases << " bases." << endl;
         } else {
             cout << "Secuencia " << itSec->getDescripcion()<< " contiene " << numBases << " bases." << endl;
         }

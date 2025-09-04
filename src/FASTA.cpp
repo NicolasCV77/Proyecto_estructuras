@@ -40,11 +40,6 @@ void FASTA::listarSecuencias() {
         cout << "Hay " << secuencias.size() << " Cargadas en memoria" << endl;
         vector<Secuencia>::iterator it;
         for(it = secuencias.begin();it !=  secuencias.end(); it++){
-            if(it->ContarNoExactas()>0){
-                cout <<"Secuencia " << it->getDescripcion() << " contiene al menos " << it->ContarExactas() << " bases" << endl;
-            }else{
-                cout <<"Secuencia " << it->getDescripcion() << " contiene " << it->ContarExactas() << " bases" << endl;
-            }
         }
     }
 } 
@@ -72,8 +67,6 @@ void FASTA::histograma(string descripcion) {
 }
 
 void FASTA::contarSubsecuencia(string sub) {
-
-    
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas" << endl;
         exit(0);
@@ -82,9 +75,7 @@ void FASTA::contarSubsecuencia(string sub) {
     vector<Secuencia>::iterator it;
     int siSubsecuencia = 0;
 
-    for (it = secuencias.begin(); it != secuencias.end(); it++) {
-        siSubsecuencia+=it->esSubsecuencia(sub);
-    }
+    
 
     if(siSubsecuencia > 0) {
         cout << "La subsecuencia dada se repite " << siSubsecuencia << " veces dentro de las secuencias cargadas en memoria." << endl;
@@ -121,6 +112,7 @@ Secuencia FASTA::buscarSecuencia(string descripcion){
         }
     }
     cout << "No se encontro la secuencia" << endl;
+    return *itSec;
 }
 
 int FASTA::contarPosiblesBases(Secuencia secuencia){
@@ -158,6 +150,7 @@ vector<char> FASTA::getEquivalencias(char base){
             return *itComp;
         }
     }
+    return {base};
 }
 vector<Secuencia>& FASTA::getSecuencias() {
     return secuencias;

@@ -27,7 +27,6 @@ class Secuencia {
         // Operaciones principales.
         int contarBase(char base);
         int enmascarar(const string& sub);
-        int esSubsecuencia(string subsecuencia);
 
         // Exportar en formato FASTA.
         vector<string> formatoFASTA();

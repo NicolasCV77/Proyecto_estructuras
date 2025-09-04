@@ -33,9 +33,7 @@ int Secuencia::contarBase(char base) {
 int Secuencia::enmascarar(const string& sub) {
     int numeroRemplazos = 0;
 
-    if (esSubsecuencia(sub)==0) {
-        return numeroRemplazos;
-    }
+    
 
     vector<char>::iterator it;
 
@@ -49,23 +47,6 @@ int Secuencia::enmascarar(const string& sub) {
     return numeroRemplazos;
 }
 
-
-int Secuencia::esSubsecuencia(string subsecuencia) {
-    if (subsecuencia.size() > bases.size()) {
-        return 0;
-    }
-
-    vector<char>::iterator it;
-    int contador = 0;
-
-    for (it = bases.begin(); it <= bases.end() - subsecuencia.size(); it++) {
-        if (equal(subsecuencia.begin(), subsecuencia.end(), it)) {
-            // Se encontró la secuencia.
-            contador++;
-        }
-    }
-    return contador;
-}
  
 vector<string> Secuencia::formatoFASTA() {
     vector<string> lineas;

@@ -30,22 +30,17 @@ int Secuencia::contarBase(char base) {
     return contador;
 }
 
-int Secuencia::enmascarar(const string& sub) {
-    int numeroRemplazos = 0;
-
-    
-
-    vector<char>::iterator it;
-
-    for (it = bases.begin(); it <= bases.end() - sub.size(); ++it) {
-        if (equal(sub.begin(), sub.end(), it)) {
-            // Reemplazar cada caracter de la subcadena encontrada por 'X'.
-            fill(it, it + sub.size(), 'X');
-            numeroRemplazos++;
-        }
+int Secuencia::enmascarar(int inicio, int fin) {
+    if (inicio < 0 || fin >= bases.size() || inicio > fin) {
+        return 0; // nada que enmascarar
     }
-    return numeroRemplazos;
+
+    for (int i = inicio; i <= fin; i++) {
+        bases[i] = 'X';
+    }
+    return 1; // un enmascaramiento hecho
 }
+
 
  
 vector<string> Secuencia::formatoFASTA() {

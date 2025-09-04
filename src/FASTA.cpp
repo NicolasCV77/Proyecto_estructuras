@@ -36,16 +36,39 @@ int FASTA::totalSecuencias(){
 void FASTA::listarSecuencias() {
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas en memoria" << endl;
-    } else {
-        cout << "Hay " << secuencias.size() << " Cargadas en memoria" << endl;
-        vector<Secuencia>::iterator it;
-        for(it = secuencias.begin();it !=  secuencias.end(); it++){
-        }
+        return;
     }
-} 
+
+    cout << "Hay " << secuencias.size() << " cargadas en memoria" << endl;
+
+    vector<Secuencia>::iterator itSec;
+    for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
+        // contar posibles bases distintas
+        int numBases = contarPosiblesBases(*itSec);
+
+        // verificar si contiene alguna base NO exacta
+        bool tieneNoExactas = false;
+        vector<char> bases = itSec->getBases();
+        vector<char>::iterator itBase;
+        for (itBase = bases.begin(); itBase != bases.end(); itBase++) {
+            vector<char> eq = getEquivalencias(*itBase);
+            if (eq.size() > 1) { 
+                tieneNoExactas = true;
+                break;
+            }
+        }
+
+        if (tieneNoExactas) {
+            cout << "Secuencia " << itSec->getDescripcion()<< " contiene AL MENOS " << numBases << " bases." << endl;
+        } else {
+            cout << "Secuencia " << itSec->getDescripcion()<< " contiene " << numBases << " bases." << endl;
+        }
+
+    }
+}
+
 
 void FASTA::histograma(string descripcion) {
-    FASTA();
     vector<Secuencia>:: iterator itSec;
     for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
         if (itSec->getDescripcion()== descripcion) {
@@ -69,40 +92,63 @@ void FASTA::histograma(string descripcion) {
 void FASTA::contarSubsecuencia(string sub) {
     if (secuencias.empty()) {
         cout << "No hay secuencias cargadas" << endl;
-        exit(0);
+        return; // mejor return en vez de exit(0)
     }
 
-    vector<Secuencia>::iterator it;
+    vector<char> subSecuencia(sub.begin(), sub.end()); // convertir string a vector<char>
     int siSubsecuencia = 0;
 
-    
-
-    if(siSubsecuencia > 0) {
-        cout << "La subsecuencia dada se repite " << siSubsecuencia << " veces dentro de las secuencias cargadas en memoria." << endl;
-    } else {
-        cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
-    }
-} 
-
-void FASTA::enmascararSubsecuencia(string sub) {
-    if (secuencias.empty()) {
-        cout << "No hay secuencias cargadas" << endl;
-        exit(0);
-    }
-
+    // Recorremos cada secuencia cargada
     vector<Secuencia>::iterator it;
-    int enmascaradas = 0;
-
     for (it = secuencias.begin(); it != secuencias.end(); it++) {
-        enmascaradas+=it->enmascarar(sub);
+        vector<char> bases = it->getBases();
+        int n = bases.size();
+        int m = subSecuencia.size();
+
+        // revisar todas las posiciones posibles dentro de la secuencia
+        for (int i = 0; i <= n - m; i++) {
+            if (subEncontrada(bases, subSecuencia, i)) {
+                siSubsecuencia++;
+            }
+        }
     }
 
-    if (enmascaradas > 0) {
-        cout << "La subsecuencia dada se repite " << enmascaradas << " veces dentro de las secuencias cargadas en memoria." << endl;
+    if (siSubsecuencia > 0) {
+        cout << "La subsecuencia dada se repite " << siSubsecuencia<< " veces dentro de las secuencias cargadas en memoria." << endl;
     } else {
         cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
     }
 }
+ 
+
+void FASTA::enmascararSubsecuencia(string sub) {
+    if (secuencias.empty()) {
+        cout << "No hay secuencias cargadas" << endl;
+        return;
+    }
+
+    vector<char> subSecuencia(sub.begin(), sub.end());
+    int enmascaradas = 0;
+
+    for (auto& sec : secuencias) {
+        // Recorremos cada posible posición
+        for (int i = 0; i <= sec.getBases().size() - subSecuencia.size(); i++) {
+            if (subEncontrada(sec.getBases(), subSecuencia, i)) {
+                int inicio = i;
+                int fin = i + subSecuencia.size() - 1;
+                enmascaradas += sec.enmascarar(inicio, fin);
+            }
+        }
+    }
+
+    if (enmascaradas > 0) {
+        cout << "La subsecuencia dada se enmascaró " 
+             << enmascaradas << " veces dentro de las secuencias cargadas en memoria." << endl;
+    } else {
+        cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
+    }
+}
+
 
 Secuencia FASTA::buscarSecuencia(string descripcion){
     vector<Secuencia> :: iterator itSec;
@@ -112,35 +158,116 @@ Secuencia FASTA::buscarSecuencia(string descripcion){
         }
     }
     cout << "No se encontro la secuencia" << endl;
-    return *itSec;
+    return Secuencia("",{},0);
 }
 
-int FASTA::contarPosiblesBases(Secuencia secuencia){
+int FASTA::contarPosiblesBases(Secuencia secuencia) {
+    vector<char> bases = secuencia.getBases();
+    vector<char>::iterator itBases;
 
-    vector <vector<char>> :: iterator itComp;
-    vector <char> :: iterator itCompComp;
-    vector <char> :: iterator itBases;
-    vector <char> :: iterator itEquivalentes;
-
-    vector <char> bases = secuencia.getBases();
-    vector <char> equivalentes;
-    vector <char> distintas;
+    vector<char> contadas; // aquí guardamos las bases exactas ya contadas
+    vector<char>::iterator itCont;
+    int contador = 0;
 
     for (itBases = bases.begin(); itBases != bases.end(); itBases++) {
-        vector <char> equivalentes = getEquivalencias(*itBases);
+        // Ignorar '-' y 'X'
+        if (*itBases == '-' || *itBases == 'X') {
+            continue;
+        }
 
-        if(equivalentes.size()>1){
-            for(itEquivalentes = equivalentes.begin() ; itEquivalentes != equivalentes.end(); itEquivalentes++){
-                if(*itEquivalentes != *itBases){
-                    distintas.push_back(*itEquivalentes);
+        vector<char> equivalentes = getEquivalencias(*itBases);
+        vector<char>::iterator itEq;
+
+        if (equivalentes.size() == 1 && equivalentes[0] == *itBases) {
+            // Caso base exacta
+            bool yaEsta = false;
+            for (itCont = contadas.begin(); itCont != contadas.end(); itCont++) {
+                if (*itCont == *itBases) {
+                    yaEsta = true;
+                    break;
                 }
             }
-        }else{
-            distintas.push_back(*itBases);
+            if (!yaEsta) {
+                contadas.push_back(*itBases);
+                contador++;
+            }
+        } else {
+            // Caso base NO exacta (R, Y, K, etc.)
+            bool algunoYaContado = false;
+
+            for (itEq = equivalentes.begin() + 1; itEq != equivalentes.end(); itEq++) {
+                for (itCont = contadas.begin(); itCont != contadas.end(); itCont++) {
+                    if (*itCont == *itEq) {
+                        algunoYaContado = true;
+                        break;
+                    }
+                }
+                if (algunoYaContado) {
+                    break;
+                }
+            }
+
+            if (!algunoYaContado) {
+                if (equivalentes.size() > 1) {
+                    // tomamos un representante (el primero exacto de la lista)
+                    contadas.push_back(*(equivalentes.begin() + 1));
+                    contador++;
+                }
+            }
         }
     }
-    return distintas.size();
+
+    return contador;
 }
+
+
+
+
+
+
+
+bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int inicio) {
+    vector<char>::iterator itSubsecuencia;
+    vector<vector<char>>::iterator itComponentes;
+
+    int contador = 0;
+    for (itSubsecuencia = subSecuencia.begin(); itSubsecuencia != subSecuencia.end(); itSubsecuencia++) {
+        char baseSecuencia = bases[inicio + contador];
+        char basePatron = *itSubsecuencia;
+        contador++;
+
+        // Buscar el grupo de equivalencias del basePatron
+        vector<char> grupoPatron;
+        for (itComponentes = componentes.begin(); itComponentes != componentes.end(); itComponentes++) {
+            vector<char>::iterator itEquivalencias;
+            for (itEquivalencias = itComponentes->begin(); itEquivalencias != itComponentes->end(); itEquivalencias++) {
+                if (*itEquivalencias == basePatron) {
+                    grupoPatron = *itComponentes; // copiamos el grupo completo
+                    break;
+                }
+            }
+            if (!grupoPatron.empty()) break; // ya lo encontramos
+        }
+
+        // Verificar si baseSecuencia pertenece al grupoPatron
+        bool pertenece = false;
+        for (vector<char>::iterator itEquivalencias = grupoPatron.begin();
+             itEquivalencias != grupoPatron.end();
+             itEquivalencias++) {
+            if (*itEquivalencias == baseSecuencia) {
+                pertenece = true;
+                break;
+            }
+        }
+
+        if (!pertenece) {
+            return false; // si alguna no coincide, ya no es subsecuencia
+        }
+    }
+
+    return true; // todas coincidieron
+}
+
 
 vector<char> FASTA::getEquivalencias(char base){
     vector <char> equivalencias;

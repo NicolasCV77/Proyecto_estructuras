@@ -142,8 +142,7 @@ void FASTA::enmascararSubsecuencia(string sub) {
     }
 
     if (enmascaradas > 0) {
-        cout << "La subsecuencia dada se enmascaró " 
-             << enmascaradas << " veces dentro de las secuencias cargadas en memoria." << endl;
+        cout << "La subsecuencia dada se enmascaro " << enmascaradas << " veces dentro de las secuencias cargadas en memoria." << endl;
     } else {
         cout << "La subsecuencia dada no existe dentro de las secuencias cargadas en memoria." << endl;
     }
@@ -165,12 +164,11 @@ int FASTA::contarPosiblesBases(Secuencia secuencia) {
     vector<char> bases = secuencia.getBases();
     vector<char>::iterator itBases;
 
-    vector<char> contadas; // aquí guardamos las bases exactas ya contadas
+    vector<char> contadas;
     vector<char>::iterator itCont;
     int contador = 0;
 
     for (itBases = bases.begin(); itBases != bases.end(); itBases++) {
-        // Ignorar '-' y 'X'
         if (*itBases == '-' || *itBases == 'X') {
             continue;
         }
@@ -192,7 +190,6 @@ int FASTA::contarPosiblesBases(Secuencia secuencia) {
                 contador++;
             }
         } else {
-            // Caso base NO exacta (R, Y, K, etc.)
             bool algunoYaContado = false;
 
             for (itEq = equivalentes.begin() + 1; itEq != equivalentes.end(); itEq++) {
@@ -209,7 +206,6 @@ int FASTA::contarPosiblesBases(Secuencia secuencia) {
 
             if (!algunoYaContado) {
                 if (equivalentes.size() > 1) {
-                    // tomamos un representante (el primero exacto de la lista)
                     contadas.push_back(*(equivalentes.begin() + 1));
                     contador++;
                 }
@@ -233,27 +229,25 @@ bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int ini
     int contador = 0;
     for (itSubsecuencia = subSecuencia.begin(); itSubsecuencia != subSecuencia.end(); itSubsecuencia++) {
         char baseSecuencia = bases[inicio + contador];
-        char basePatron = *itSubsecuencia;
+        char baseSub = *itSubsecuencia;
         contador++;
 
-        // Obtener las equivalencias de la base en la SECUENCIA (NO del patrón)
         vector<char> grupoSecuencia = getEquivalencias(baseSecuencia);
 
-        // Verificar si el patrón pertenece al grupo de la secuencia
         bool pertenece = false;
         for (itEq = grupoSecuencia.begin(); itEq != grupoSecuencia.end(); itEq++) {
-            if (*itEq == basePatron) {
+            if (*itEq == baseSub) {
                 pertenece = true;
                 break;
             }
         }
 
         if (!pertenece) {
-            return false; // si no coincide en esta posición, no hay match
+            return false;
         }
     }
 
-    return true; // todas las posiciones coincidieron
+    return true;
 }
 
 

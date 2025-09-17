@@ -107,7 +107,7 @@ void FASTA::contarSubsecuencia(string sub) {
         for (int i = 0; i <= n - m; i++) {
             bool encontrada = subEncontrada(bases, subSecuencia, i);
             if (encontrada) {
-                siSubsecuencia++;  // cuenta SOLO UNA VEZ el match en esa posición
+                siSubsecuencia++;
             }
         }
     }
@@ -119,7 +119,6 @@ void FASTA::contarSubsecuencia(string sub) {
     }
 }
 
- 
 
 void FASTA::enmascararSubsecuencia(string sub) {
     if (secuencias.empty()) {
@@ -130,13 +129,13 @@ void FASTA::enmascararSubsecuencia(string sub) {
     vector<char> subSecuencia(sub.begin(), sub.end());
     int enmascaradas = 0;
 
-    for (auto& sec : secuencias) {
+    for (vector<Secuencia>::iterator it = secuencias.begin(); it != secuencias.end(); ++it) {
         // Recorremos cada posible posición
-        for (int i = 0; i <= sec.getBases().size() - subSecuencia.size(); i++) {
-            if (subEncontrada(sec.getBases(), subSecuencia, i)) {
+        for (int i = 0; i <= it->getBases().size() - subSecuencia.size(); i++) {
+            if (subEncontrada(it->getBases(), subSecuencia, i)) {
                 int inicio = i;
                 int fin = i + subSecuencia.size() - 1;
-                enmascaradas += sec.enmascarar(inicio, fin);
+                enmascaradas += it->enmascarar(inicio, fin);
             }
         }
     }
@@ -205,12 +204,7 @@ int FASTA::contarPosiblesBases(Secuencia secuencia) {
     return contador;
 }
 
-
-
-
-
-
-
+// 
 bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int inicio) {
     vector<char>::iterator itSubsecuencia;
     vector<char>::iterator itEq;
@@ -239,8 +233,7 @@ bool FASTA::subEncontrada(vector<char> bases, vector<char> subSecuencia, int ini
     return true;
 }
 
-
-
+// 
 vector<char> FASTA::getEquivalencias(char base){
     vector <char> equivalencias;
     vector <vector<char>> :: iterator itComp;
@@ -251,9 +244,11 @@ vector<char> FASTA::getEquivalencias(char base){
     }
     return {base};
 }
+
 vector<Secuencia>& FASTA::getSecuencias() {
     return secuencias;
 }
+
 vector<vector<char>>& FASTA::getComponentes(){
     return componentes;
 }

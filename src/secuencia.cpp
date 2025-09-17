@@ -40,28 +40,4 @@ int Secuencia::enmascarar(int inicio, int fin) {
     }
     return 1; // un enmascaramiento hecho
 }
-
-
- 
-vector<string> Secuencia::formatoFASTA() {
-    vector<string> lineas;
-    vector<char>::iterator it;
-    vector<char>::iterator fin;
-
-    if(bases.empty()) {
-        return lineas;
-    }
-
-    for (auto it = bases.begin(); it != bases.end(); ) {
-        fin = it + ancho;
-        if (fin > bases.end()) {
-            fin = bases.end();
-        }
-
-        lineas.emplace_back(it, fin);
-        it = fin;
-    }
-
-    return lineas;
-}
-
+    

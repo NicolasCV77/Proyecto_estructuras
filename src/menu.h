@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "comando.h"
- 
+
 using namespace std;
 
 // Clase Menú, representa la interfaz del usuario en consola.

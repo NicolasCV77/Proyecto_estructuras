@@ -1,6 +1,6 @@
 #include <fstream>
 #include "comando.h"
- 
+
 // Constructor Comando.
 Comando::Comando(ComandoFuncion accion, const string& nombre, int argumentos, const string& descripcion, const string& uso) {
     this->accion = accion;
@@ -36,5 +36,4 @@ void Comando::ejecutar(const string& arg1, const string& arg2) {
         accion(arg1, arg2);
     }
 }
-
-
+    

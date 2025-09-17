@@ -6,13 +6,13 @@
 #include "menu.h"
 #include "comando.h"
 #include "sistema.h"
- 
+
 // Vector que almacena todos los comandos de menú.
 vector<Comando> Menu::comandos;
 
 // Instancia principal del sistema.
 Sistema sistema;
- 
+
 // Constructor Menú.
 Menu::Menu() {
     inicializarComandos();
@@ -57,7 +57,7 @@ void Menu::imprimirMenu() {
             break;
         if (strlen(linea) == 0) 
             continue;
-
+        
         // Tokeniza la línea de entrada, separando comandos de argumentos.
         char* token = strtok(linea, " ");
         char* a1 = strtok(nullptr, " ");
@@ -110,7 +110,7 @@ void Menu::imprimirMenu() {
         }
     }
 }
- 
+
 // Listar todos los comandos o uno en específico.
 void Menu::comandoAyuda(const string& arg1, const string& arg2) {
     // Validar argumentos.

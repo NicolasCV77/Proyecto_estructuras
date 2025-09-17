@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "menu.h"
- 
+
 // Programa principal.
 int main() {
     // Muestra el menú.

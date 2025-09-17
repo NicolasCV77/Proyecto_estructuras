@@ -9,10 +9,8 @@ using namespace std;
 
 class Secuencia {
     private:
-        string descripcion;
-        vector <char> bases;
-        vector <char> componentesExactos;
-        vector <char> componentesNoExactos;
+        vector <char> bases;    
+        string descripcion; 
         int ancho;
 
     public:
@@ -28,9 +26,6 @@ class Secuencia {
         int contarBase(char base);
         int enmascarar(int inicio, int fin);
 
-        // Exportar en formato FASTA.
-        vector<string> formatoFASTA();
-        
 };
 
 #endif

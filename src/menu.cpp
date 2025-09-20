@@ -53,18 +53,22 @@ void Menu::imprimirMenu() {
         cout << endl << "$ ";
 
         // Leer línea completa.
-        if (!cin.getline(linea, sizeof(linea))) 
+        if (!cin.getline(linea, sizeof(linea))) {
             break;
-        if (strlen(linea) == 0) 
+        }
+
+        if (strlen(linea) == 0) {
             continue;
-        
+        }
+
         // Tokeniza la línea de entrada, separando comandos de argumentos.
         char* token = strtok(linea, " ");
         char* a1 = strtok(nullptr, " ");
         char* a2 = strtok(nullptr, " ");
 
-        if (!token) 
+        if (!token) {
             continue;
+        }
 
         // Guardar en strings independientes.
         string cmd(token);
@@ -88,8 +92,7 @@ void Menu::imprimirMenu() {
 
         // Buscar en los comandos registrados.
         for (it=comandos.begin(); it!=comandos.end(); it++) {
-            
-            if (cmd == it->getNombre()) {
+            if (cmd == it->getNombre()) { 
                 encontrado = true;
 
                 // Validar cantidad de argumentos.
@@ -116,6 +119,7 @@ void Menu::comandoAyuda(const string& arg1, const string& arg2) {
     // Validar argumentos.
     if (arg1.empty()) {
         cout << "Comandos disponibles: " << endl;
+
         vector <Comando>::iterator it;
         for (it = comandos.begin(); it != comandos.end(); it++) {
             cout << " - " << it->getNombre() << ": " << it->getDescripcion() << endl;

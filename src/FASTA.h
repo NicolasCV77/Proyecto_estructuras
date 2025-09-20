@@ -8,9 +8,10 @@
 
 using namespace std;
 
+// Clase FASTA, representa un conjunto de secuencias.
 class FASTA {
     private:
-        // Conjunto de secuencias cargadas.
+        // Conjunto de secuencias, lista de equivalencias y límite de bases exactas.
         vector<Secuencia> secuencias;
         vector<vector<char>> componentes;
         int limiteExactas;
@@ -29,11 +30,11 @@ class FASTA {
         void contarSubsecuencia(string sub);
         void enmascararSubsecuencia(string sub);
 
-        //Funciones de apoyo
+        // Funciones de apoyo.
         int contarPosiblesBases(Secuencia secuencia);
         bool subEncontrada (vector <char> bases, vector <char> secuencia, int inicio);
 
-        // Acceso directo.
+        // Métodos de acceso.
         vector<char> getEquivalencias(char base);
         vector<Secuencia>& getSecuencias();
         vector<vector<char>>& getComponentes();

@@ -148,7 +148,7 @@ void Sistema::cargarArchivo(string nombreArchivo) {
             // Guardar la línea completa.
             lineas.push_back(linea);
 
-            // Registrar ancho de la primera línea
+            // Registrar ancho de la primera línea.
             if (lineas.size() == 1) {
                 ancho = linea.size();
             }

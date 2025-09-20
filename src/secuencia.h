@@ -7,8 +7,10 @@
 
 using namespace std;
 
+// Clase Secuencia, representa una secuencia de bases.
 class Secuencia {
     private:
+        // Atributos.
         vector <char> bases;    
         string descripcion; 
         int ancho;
@@ -17,7 +19,7 @@ class Secuencia {
         // Constructor.
         Secuencia(const string& descripcion, const vector<char>& linea, int anchoLinea);
 
-        // Getters.
+        // Métodos de acceso.
         string getDescripcion();
         vector <char> getBases();
         int getAncho();

@@ -36,4 +36,3 @@ void Comando::ejecutar(const string& arg1, const string& arg2) {
         accion(arg1, arg2);
     }
 }
-    

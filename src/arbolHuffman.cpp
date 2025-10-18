@@ -21,12 +21,12 @@ bool arbolHuffman::esVacio() {
 }
 
 
-T arbolHuffman::datoRaiz() {
+nodoHuffman arbolHuffman::datoRaiz() {
     return (this->raiz)->obtenerDato();
 }
 
 
-int arbolHuffman::::altura() {
+int arbolHuffman::altura() {
     if (this->esVacio()) {
         return -1;
     } else {
@@ -35,7 +35,7 @@ int arbolHuffman::::altura() {
 }
 
 
-int arbolHuffman::::tamano() {
+int arbolHuffman::tamano() {
     if (this->esVacio()) {
         return 0;
     } else {
@@ -44,25 +44,25 @@ int arbolHuffman::::tamano() {
 }
 
 
-bool arbolHuffman::::insertar(T val) {
+bool arbolHuffman::insertar(int val) {
 
     if (this->esVacio()) {
-        this->raiz = new NodoBinario::(val);
+        this->raiz = new nodoHuffman(val);
         return true;
     }
 
-    NodoBinario:: *actual = this->raiz;
+    nodoHuffman *actual = this->raiz;
     while (true) {
         if (val < actual->obtenerDato()) {
             if (actual->obtenerHijoIzq() == NULL) {
-                actual->fijarHijoIzq(new NodoBinario::(val));
+                actual->fijarHijoIzq(new nodoHuffman(val));
                 return true;
             }
             actual = actual->obtenerHijoIzq();
         } 
         else if (val > actual->obtenerDato()) {
             if (actual->obtenerHijoDer() == NULL) {
-                actual->fijarHijoDer(new NodoBinario::(val));
+                actual->fijarHijoDer(new nodoHuffman(val));
                 return true;
             }
             actual = actual->obtenerHijoDer();
@@ -74,13 +74,13 @@ bool arbolHuffman::::insertar(T val) {
 }
 
 
-bool arbolHuffman::::eliminar(T val) {
+bool arbolHuffman::eliminar(int val) {
     if (this->raiz == NULL) {
         return false;
     }
 
-    NodoBinario:: *actual = this->raiz;
-    NodoBinario:: *padre = NULL;
+    nodoHuffman *actual = this->raiz;
+    nodoHuffman *padre = NULL;
 
     while (actual != NULL && actual->obtenerDato() != val) {
         padre = actual;
@@ -107,7 +107,7 @@ bool arbolHuffman::::eliminar(T val) {
         actual->fijarHijoDer(NULL);
         delete actual;
     } else if (actual->obtenerHijoIzq() == NULL || actual->obtenerHijoDer() == NULL) {
-        NodoBinario::* hijo = NULL;
+        nodoHuffman* hijo = NULL;
 
         if (actual->obtenerHijoIzq() != NULL) {
             hijo = actual->obtenerHijoIzq();
@@ -127,8 +127,8 @@ bool arbolHuffman::::eliminar(T val) {
         actual->fijarHijoDer(NULL);
         delete actual;
     } else {
-        NodoBinario::* reemplazo = actual->obtenerHijoIzq();
-        NodoBinario::* padreReemplazo = actual;
+        nodoHuffman* reemplazo = actual->obtenerHijoIzq();
+        nodoHuffman* padreReemplazo = actual;
 
         while (reemplazo->obtenerHijoDer() != NULL) {
             padreReemplazo = reemplazo;
@@ -151,8 +151,8 @@ bool arbolHuffman::::eliminar(T val) {
 }
 
 
-bool arbolHuffman::::buscar (T val) {
-    NodoBinario:: *nodo = this->raiz;
+bool arbolHuffman::buscar (int val) {
+    nodoHuffman *nodo = this->raiz;
     bool encontrado = false;
 
     while (nodo != NULL && !encontrado){
@@ -168,33 +168,33 @@ bool arbolHuffman::::buscar (T val) {
 }
 
 
-void arbolHuffman::::preOrden () {
+void arbolHuffman::preOrden () {
     if(!this->esVacio()){
         (this->raiz)->preOrden();
     }
 }
 
 
-void arbolHuffman::::postOrden () {
+void arbolHuffman::postOrden () {
     if(!this->esVacio()){
         (this->raiz)->posOrden();
     }
 }
 
 
-void arbolHuffman::::inOrden (){
+void arbolHuffman::inOrden (){
     if(!this->esVacio()){
         (this->raiz)->inOrden();
     }
 }
 
 
-void arbolHuffman::::nivelOrden(){
+void arbolHuffman::nivelOrden(){
     if (!this->esVacio()){
-        queue <NodoBinario::*> q;
+        queue <nodoHuffman*> q;
         q.push(this->raiz);
 
-        NodoBinario::* nodo;
+        nodoHuffman* nodo;
 
         while(!q.empty()){
             nodo = q.front();

@@ -11,15 +11,9 @@ class arbolHuffman {
         ~arbolHuffman();
         bool esVacio();
         nodoHuffman datoRaiz();
-        int altura();
-        int tamano();
         bool insertar(int val);
         bool eliminar(int val);
         bool buscar(int val);
-        void preOrden();
-        void postOrden();
-        void inOrden();
-        void nivelOrden();
 };
 
 

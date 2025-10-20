@@ -177,8 +177,9 @@ void Menu::comandoCodificar(const string& arg1, const string&) {
     if (arg1.empty()) {
         cout << "[ERROR] Uso: codificar nombre_archivo.fabin" << endl;
         return;
+    }else{
+        sistema.guardarCodificacion(arg1);
     }
-    cout << "[OK] Archivo '" << arg1 << "' codificado (implementación pendiente)." << endl;
 }
 
 // Importar un archivo binario al formato FASTA.

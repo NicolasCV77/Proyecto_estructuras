@@ -215,6 +215,124 @@ void Sistema::guardarArchivo(string nombreArchivo) {
     cout << "Las secuencias han sido guardadas en '" << nombreArchivo << "'." << endl;
 }
 
+void Sistema::generarMapFrecuencia(){
+    vector<Secuencia> secuencias = fasta.getSecuencias();
+    vector<Secuencia>::iterator it;
+    vector<char>:: iterator itBase;
+
+    for (it = secuencias.begin(); it != secuencias.end(); ++it) {
+        cout << "Procesando secuencia..." << endl;
+        vector<char> secuencia = it->getBases();
+        cout << "Bases: " << secuencia.size() << endl;
+        for (itBase = secuencia.begin(); itBase != secuencia.end(); ++itBase) {
+            frecuencias[*itBase]++;
+            cout << *itBase ;
+        }
+    }
+}
+
+
+
+void Sistema::guardarCodificacion(string nombreArchivo) {
+    
+    vector<Secuencia>secuencias = fasta.getSecuencias();
+    uint32_t numSecuencias = static_cast<uint32_t>(secuencias.size());
+    uint16_t numBases = static_cast<uint16_t>(frecuencias.size());
+    //Verificar que hayan secuencias para codificar
+    if(numSecuencias==0){
+        cout << "No hay secuencias cargadas, vualva a intentarlo" << endl;
+        return;
+    }
+
+    //Primeros paso para realizar el archivo codificado
+    generarMapFrecuencia();
+    arbol.construir(frecuencias);
+
+    cout << "hola" <<endl;
+    //Abriri archivo
+    ofstream archivo(nombreArchivo, ios::binary);
+    if (!archivo.is_open()) {
+        std::cerr << "Error: no se pudo abrir " << nombreArchivo << " para escritura.\n";
+        return;
+    }
+
+    //Se escribe el numero de bases
+    archivo.write(reinterpret_cast<const char*>(&numBases), sizeof(numBases));
+    if (!archivo) {
+        std::cerr << "Error al escribir el número de bases.\n";
+        archivo.close();
+        return;
+    }
+    
+    //Escribir bases con su frecuencia segun el map
+    map<char, int>::iterator itFrec = frecuencias.begin();
+    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); ++itFrec) {
+        char base = itFrec->first;               // Ejemplo: 'A', 'C', 'G', 'T'
+        int frec = itFrec->second;     // Frecuencia asociada a la base
+
+        if (frec < 0) {
+            frec = 0; // Seguridad
+        }
+
+        uint8_t ci = static_cast<uint8_t>(static_cast<unsigned char>(base));
+        uint64_t fi = static_cast<uint64_t>(frec);
+
+        archivo.write(reinterpret_cast<const char*>(&ci), sizeof(ci));
+        archivo.write(reinterpret_cast<const char*>(&fi), sizeof(fi));
+
+        if (!archivo) {
+            cerr << "Error al escribir par (ci, fi) para la base: " << base << "\n";
+            archivo.close();
+            return;
+        }
+    }   
+
+    //Se escribe el numero de secuencias
+    archivo.write(reinterpret_cast<const char*>(&numSecuencias), sizeof(numSecuencias));
+    if (!archivo) {
+        std::cerr << "Error al escribir el número de secuencias.\n";
+        archivo.close();
+        return;
+    }
+
+    // Recorrer las secuencias y guardarlas en el archivo
+    vector<Secuencia>::iterator itSec;
+    vector<char> bases;
+    string secuenciaSinCodificar;
+    string secuenciaCodificada;
+
+    for (itSec = secuencias.begin(); itSec != secuencias.end(); ++itSec) {
+        // 1️⃣ Obtener las bases sin codificar
+        bases = itSec->getBases();
+        secuenciaSinCodificar = string(bases.begin(), bases.end());
+
+        // 2️⃣ Codificar usando el árbol de Huffman
+        secuenciaCodificada = arbol.codificar(secuenciaSinCodificar);
+
+        // 3️⃣ Guardar la descripción de la secuencia (longitud + texto)
+        string descripcion = itSec->getDescripcion();
+        uint16_t tamDescripcion = static_cast<uint16_t>(descripcion.size());
+        archivo.write(reinterpret_cast<const char*>(&tamDescripcion), sizeof(tamDescripcion));
+        archivo.write(descripcion.c_str(), tamDescripcion);
+
+        // 4️⃣ Guardar la longitud de la secuencia codificada (en bits o bytes, según tu diseño)
+        uint32_t tamCodificada = static_cast<uint32_t>(secuenciaCodificada.size());
+        archivo.write(reinterpret_cast<const char*>(&tamCodificada), sizeof(tamCodificada));
+
+        // 5️⃣ Guardar la secuencia codificada (como texto binario)
+        archivo.write(secuenciaCodificada.c_str(), tamCodificada);
+
+        // 6️⃣ Verificación
+        if (!archivo) {
+            cerr << "Error al escribir la secuencia: " << descripcion << "\n";
+            archivo.close();
+            return;
+        }
+    }
+}
+
+
+
 // Devuelve una referencia al objeto que pertenece al Sistema.
 FASTA& Sistema::getFASTA() {
     return fasta;

@@ -3,8 +3,11 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <cstdint>
 
 #include "FASTA.h"
+#include "arbolHuffman.h"
 
 using namespace std;
 
@@ -13,6 +16,8 @@ class Sistema {
     private:
         // Objeto que administra las secuencias FASTA.
         FASTA fasta;
+        map<char, int> frecuencias;
+        arbolHuffman arbol;
 
         // Funciones auxiliares.
         bool validarExtensionFA(string& nombreArchivo);
@@ -25,6 +30,13 @@ class Sistema {
         // Manejo de archivos. 
         void cargarArchivo(string nombreArchivo);
         void guardarArchivo(string nombreArchivo);
+
+        //Codificación y decodificacion
+        void generarMapFrecuencia();
+        void codificar(string nombreArchivo);
+        void decodificar();
+
+        void guardarCodificacion(string nombreArchivo);
 
         // Referencia del objeto FASTA.
         FASTA& getFASTA();

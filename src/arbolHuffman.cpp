@@ -3,10 +3,46 @@
 
 using namespace std;
 
+// Función auxiliar para generar los códigos de Huffman.
+void arbolHuffman::generarCodigos(nodoHuffman *nodo, string &codigoActual) {
+    if (nodo == nullptr) {
+        return;
+    }
+
+    // Si es un nodo hoja, guardar el código.
+    if (nodo->esHoja()) {
+        codigos[nodo->obtenerSimbolo()] = codigoActual;
+    }
+
+    // Recorrer hijo izquierdo con '0' añadido al código.
+    codigoActual.push_back('0');
+    generarCodigos(nodo->obtenerHijoIzq(), codigoActual);
+    codigoActual.pop_back();
+
+    // Recorrer hijo derecho con '1' añadido al código.
+    codigoActual.push_back('1');
+    generarCodigos(nodo->obtenerHijoDer(), codigoActual);
+    codigoActual.pop_back();
+}
+
+// Función auxiliar para destruir el árbol.
+void arbolHuffman::destruirArbol(nodoHuffman *nodo) {
+    if (nodo != NULL) {
+        destruirArbol(nodo->obtenerHijoIzq());
+        destruirArbol(nodo->obtenerHijoDer());
+        delete nodo;
+    }
+}
+
+// Comparador para la cola de prioridad.
+bool arbolHuffman::compararNodos(nodoHuffman *a, nodoHuffman *b) {
+    return a->obtenerFrecuencia() > b->obtenerFrecuencia();
+}
+
+// Constructor y destructor.
 arbolHuffman::arbolHuffman() {
     this->raiz = NULL;
 }
-
 
 arbolHuffman::~arbolHuffman() {
     if (this->raiz != NULL) {
@@ -15,197 +51,88 @@ arbolHuffman::~arbolHuffman() {
     }
 }
 
-
+// Verificar si el árbol está vacío.
 bool arbolHuffman::esVacio() {
     return this->raiz == NULL;
 }
 
+// Construir el árbol de Huffman a partir de las frecuencias dadas.
+void arbolHuffman::construir(map<char, int> &frecuencias) {
+    // Declarar la cola de prioridad usando el comparador.
+    priority_queue<nodoHuffman*, vector<nodoHuffman*>, Comparador> cola;
 
-nodoHuffman arbolHuffman::datoRaiz() {
-    return (this->raiz)->obtenerDato();
+    // Crear un nodo hoja para cada símbolo y agregarlo a la cola.
+    map<char, int>::iterator it;
+    for (it = frecuencias.begin(); it != frecuencias.end(); it++) {
+        nodoHuffman* nuevoNodo = new nodoHuffman(it->second, it->first);
+        cola.push(nuevoNodo);
+    }
+
+    // Construir el árbol de Huffman.
+    while (cola.size() > 1) {
+        nodoHuffman *izquierdo = cola.top();
+        cola.pop();
+
+        nodoHuffman *derecho = cola.top();
+        cola.pop();
+
+        nodoHuffman *nuevoNodo = new nodoHuffman(izquierdo->obtenerFrecuencia() + derecho->obtenerFrecuencia(), '\0');
+        nuevoNodo->fijarHijoIzq(izquierdo);
+        nuevoNodo->fijarHijoDer(derecho);
+
+        cola.push(nuevoNodo);
+    }
+
+    // La raíz del árbol es el único nodo restante en la cola.
+    this->raiz = cola.top();
+
+    // Generar los códigos de Huffman.
+    string codigoActual;
+    generarCodigos(this->raiz, codigoActual);
 }
 
-
-int arbolHuffman::altura() {
-    if (this->esVacio()) {
-        return -1;
-    } else {
-        return (this->raiz)->altura();
-    }
+// Obtener los códigos de Huffman generados.
+map<char, string> arbolHuffman::obtenerCodigos() {
+    return codigos;
 }
 
-
-int arbolHuffman::tamano() {
-    if (this->esVacio()) {
-        return 0;
-    } else {
-        return (this->raiz)->tamano();
+// Codificar un texto utilizando los códigos de Huffman.
+string arbolHuffman::codificar(string &texto) {
+    string textoCodificado;
+    for (char simbolo : texto) {
+        textoCodificado += codigos[simbolo];
     }
+
+    return textoCodificado;
 }
 
+// Decodificar un texto codificado utilizando el árbol de Huffman.
+string arbolHuffman::decodificar(string &textoCodificado) {
+    string textoDecodificado;
+    nodoHuffman *nodoActual = this->raiz;
 
-bool arbolHuffman::insertar(int val) {
+    for (char bit : textoCodificado) {
+        if (bit == '0') {
+            nodoActual = nodoActual->obtenerHijoIzq();
+        } else if (bit == '1') {
+            nodoActual = nodoActual->obtenerHijoDer();
+        }
 
-    if (this->esVacio()) {
-        this->raiz = new nodoHuffman(val);
-        return true;
-    }
+        // Si llegamos a un nodo hoja, agregar el símbolo al texto decodificado.
+        if (nodoActual->esHoja()) {
+            textoDecodificado += nodoActual->obtenerSimbolo();
 
-    nodoHuffman *actual = this->raiz;
-    while (true) {
-        if (val < actual->obtenerDato()) {
-            if (actual->obtenerHijoIzq() == NULL) {
-                actual->fijarHijoIzq(new nodoHuffman(val));
-                return true;
-            }
-            actual = actual->obtenerHijoIzq();
-        } 
-        else if (val > actual->obtenerDato()) {
-            if (actual->obtenerHijoDer() == NULL) {
-                actual->fijarHijoDer(new nodoHuffman(val));
-                return true;
-            }
-            actual = actual->obtenerHijoDer();
-        } 
-        else {
-            return false; 
+            // Volver a la raíz para el siguiente símbolo.
+            nodoActual = this->raiz;
         }
     }
+
+    return textoDecodificado;
 }
 
-
-bool arbolHuffman::eliminar(int val) {
-    if (this->raiz == NULL) {
-        return false;
-    }
-
-    nodoHuffman *actual = this->raiz;
-    nodoHuffman *padre = NULL;
-
-    while (actual != NULL && actual->obtenerDato() != val) {
-        padre = actual;
-        if (val < actual->obtenerDato()) {
-            actual = actual->obtenerHijoIzq();
-        } else {
-            actual = actual->obtenerHijoDer();
-        }
-    }
-
-    if (actual == NULL) {
-        return false;
-    }
-
-    if (actual->obtenerHijoIzq() == NULL && actual->obtenerHijoDer() == NULL) {
-        if (padre == NULL) {
-            this->raiz = NULL;
-        } else if (padre->obtenerHijoIzq() == actual) {
-            padre->fijarHijoIzq(NULL);
-        } else {
-            padre->fijarHijoDer(NULL);
-        }
-        actual->fijarHijoIzq(NULL);
-        actual->fijarHijoDer(NULL);
-        delete actual;
-    } else if (actual->obtenerHijoIzq() == NULL || actual->obtenerHijoDer() == NULL) {
-        nodoHuffman* hijo = NULL;
-
-        if (actual->obtenerHijoIzq() != NULL) {
-            hijo = actual->obtenerHijoIzq();
-        } else {
-            hijo = actual->obtenerHijoDer();
-        }
-
-        if (padre == NULL) {
-            this->raiz = hijo;
-        } else if (padre->obtenerHijoIzq() == actual) {
-            padre->fijarHijoIzq(hijo);
-        } else {
-            padre->fijarHijoDer(hijo);
-        }
-
-        actual->fijarHijoIzq(NULL);
-        actual->fijarHijoDer(NULL);
-        delete actual;
-    } else {
-        nodoHuffman* reemplazo = actual->obtenerHijoIzq();
-        nodoHuffman* padreReemplazo = actual;
-
-        while (reemplazo->obtenerHijoDer() != NULL) {
-            padreReemplazo = reemplazo;
-            reemplazo = reemplazo->obtenerHijoDer();
-        }
-
-        actual->fijarDato(reemplazo->obtenerDato());
-
-        if (padreReemplazo->obtenerHijoIzq() == reemplazo) {
-            padreReemplazo->fijarHijoIzq(reemplazo->obtenerHijoIzq());
-        } else {
-            padreReemplazo->fijarHijoDer(reemplazo->obtenerHijoIzq());
-        }
-        reemplazo->fijarHijoIzq(NULL);
-        reemplazo->fijarHijoDer(NULL);
-        delete reemplazo;
-    }
-
-    return true;
-}
-
-
-bool arbolHuffman::buscar (int val) {
-    nodoHuffman *nodo = this->raiz;
-    bool encontrado = false;
-
-    while (nodo != NULL && !encontrado){
-        if(val < nodo->obtenerDato()){
-            nodo = nodo->obtenerHijoIzq();
-        } else if (val > nodo ->obtenerDato()){
-            nodo = nodo->obtenerHijoDer();
-        } else {
-            encontrado = true;
-        }
-    }
-    return encontrado;
-}
-
-
-void arbolHuffman::preOrden () {
-    if(!this->esVacio()){
+// Mostrar el árbol en preorden.
+void arbolHuffman::mostrarPreOrden () {
+    if(!this->esVacio()) {
         (this->raiz)->preOrden();
-    }
-}
-
-
-void arbolHuffman::postOrden () {
-    if(!this->esVacio()){
-        (this->raiz)->posOrden();
-    }
-}
-
-
-void arbolHuffman::inOrden (){
-    if(!this->esVacio()){
-        (this->raiz)->inOrden();
-    }
-}
-
-
-void arbolHuffman::nivelOrden(){
-    if (!this->esVacio()){
-        queue <nodoHuffman*> q;
-        q.push(this->raiz);
-
-        nodoHuffman* nodo;
-
-        while(!q.empty()){
-            nodo = q.front();
-            q.pop();
-            cout << nodo->obtenerDato() << " ";
-            if (nodo->obtenerHijoIzq() != NULL) {
-                q.push(nodo->obtenerHijoIzq());
-            }
-            if (nodo->obtenerHijoDer() != NULL) {
-                q.push(nodo->obtenerHijoDer());
-            }
-        }
     }
 }

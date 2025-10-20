@@ -1,12 +1,14 @@
 #ifndef NODOHUFFMAN_H
 #define NODOHUFFMAN_H
 
-class nodoHuffman{
-    protected:
+// Clase nodoHuffman, representa un nodo en el árbol de Huffman.
+class nodoHuffman {
+    private:
         int frecuencia;
         char simbolo;
         nodoHuffman *hijoIzq;
         nodoHuffman *hijoDer;
+
     public:
         nodoHuffman();
         nodoHuffman(int frecuencia, char simbolo);
@@ -20,7 +22,8 @@ class nodoHuffman{
         void fijarHijoIzq(nodoHuffman *izq);
         void fijarHijoDer(nodoHuffman *der);
         bool esHoja();
-};
+        void preOrden();
 
+};
 
 #endif

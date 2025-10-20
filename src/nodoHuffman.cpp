@@ -1,13 +1,12 @@
 #include "nodoHuffman.h"
+#include <iostream>
 
 using namespace std;
-
 
 nodoHuffman::nodoHuffman() {
     this->hijoIzq = nullptr;
     this->hijoDer = nullptr;
 }
-
 
 nodoHuffman::nodoHuffman(int frecuencia, char simbolo) {
     this->frecuencia = frecuencia;
@@ -15,7 +14,6 @@ nodoHuffman::nodoHuffman(int frecuencia, char simbolo) {
     this->hijoIzq = nullptr;
     this->hijoDer = nullptr;
 }
-
 
 nodoHuffman::~nodoHuffman() {
     if (this->hijoIzq != nullptr) {
@@ -26,11 +24,9 @@ nodoHuffman::~nodoHuffman() {
     }
 }
 
-
-int nodoHuffman:: obtenerFrecuencia() {
+int nodoHuffman::obtenerFrecuencia() {
     return this->frecuencia;
 }
-
 
 void nodoHuffman::fijarFrecuencia(int frecuencia) {
     this->frecuencia = frecuencia;
@@ -40,32 +36,37 @@ char nodoHuffman:: obtenerSimbolo() {
     return this->simbolo;
 }
 
-
 void nodoHuffman::fijarSimbolo(char simbolo) {
     this->simbolo = simbolo;
 }
 
-
-nodoHuffman* nodoHuffman::obtenerHijoIzq() {
+nodoHuffman *nodoHuffman::obtenerHijoIzq() {
     return this->hijoIzq;
 }
 
-
-nodoHuffman* nodoHuffman::obtenerHijoDer() {
+nodoHuffman *nodoHuffman::obtenerHijoDer() {
     return this->hijoDer;
 }
 
-
-void nodoHuffman::fijarHijoIzq(nodoHuffman* izq) {
+void nodoHuffman::fijarHijoIzq(nodoHuffman *izq) {
     this->hijoIzq = izq;
 }
 
-
-void nodoHuffman::fijarHijoDer(nodoHuffman* der) {
+void nodoHuffman::fijarHijoDer(nodoHuffman *der) {
     this->hijoDer = der;
 }
 
-
 bool nodoHuffman::esHoja() {
     return (this->hijoIzq == nullptr && this->hijoDer == nullptr);
+}
+
+void nodoHuffman::preOrden() {
+    cout << "Simbolo: " << this->simbolo << ", Frecuencia: " << this->frecuencia << endl;
+    if (this->hijoIzq != nullptr) {
+        this->hijoIzq->preOrden();
+    }
+
+    if (this->hijoDer != nullptr) {
+        this->hijoDer->preOrden();
+    }
 }

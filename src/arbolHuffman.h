@@ -17,7 +17,6 @@ struct ComparadorNodos {
     }
 };
 
-
 // Clase Árbol de Huffman.
 class arbolHuffman {
     private:

@@ -222,169 +222,168 @@ void Sistema::guardarArchivo(string nombreArchivo) {
 
 // Generar el mapa de frecuencias a partir de las secuencias cargadas.
 void Sistema::generarMapFrecuencia() {
+    // Obtener secuencias del sistema FASTA.
     vector<Secuencia>& secuencias = fasta.getSecuencias();
     vector<char> secuencia;
+
     vector<Secuencia>::iterator it;
     vector<char>::iterator itBase;
 
+    // Recorrer todas las secuencias y contar frecuencias.
     for (it = secuencias.begin(); it != secuencias.end(); it++) {
         secuencia = it->getBases();
         for (itBase = secuencia.begin(); itBase != secuencia.end(); itBase++) {
             frecuencias[*itBase]++;
         }
     }
-
-    cout << "[OK] Mapa de frecuencias generado correctamente." << endl;
 }
 
 // Codificar las secuencias y guardarlas en un archivo .fabin
 void Sistema::guardarCodificacion(string nombreArchivo) {
-    // Validar extensión.
+    // Validar extensión .fabin.
     if (!validarExtensionFABIN(nombreArchivo)) {
         cout << "[ERROR] '" << nombreArchivo << "' no es un archivo .fabin válido." << endl;
         return;
     }
 
-    // Obtener secuencias del sistema.
+    // Obtener secuencias en memoria.
     vector<Secuencia> secuencias = fasta.getSecuencias();
-    uint32_t numSecuencias = static_cast<uint32_t> (secuencias.size());
+    uint32_t numSecuencias = static_cast<uint32_t>(secuencias.size());
 
-    // Verificar que hayan secuencias para codificar.
     if (numSecuencias == 0) {
-        cout << "No hay secuencias cargadas, vuelva a intentarlo" << endl;
+        cout << "[ERROR] No hay secuencias cargadas para codificar." << endl;
         return;
     }
 
-    // Primeros pasos para realizar el archivo codificado.
+    // Generar mapa de frecuencias y construir árbol de Huffman.
     frecuencias.clear();
     generarMapFrecuencia();
-    uint16_t numBases = static_cast<uint16_t> (frecuencias.size());
+    uint16_t numBases = static_cast<uint16_t>(frecuencias.size());
 
-    // Debug
-    cout << "[OK] Mapa de frecuencias generado correctamente.\n";
-    for (auto &p : frecuencias) {
-        cout << (int)p.first << " [" << p.first << "]: " << p.second << endl;
+    // Mostrar mapa de frecuencias (debug).
+    cout << "[OK] Mapa de frecuencias generado correctamente:\n";
+    map<char, int>::iterator itFrec;
+    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); itFrec++) {
+        cout << "'" << itFrec->first << "' : " << itFrec->second << endl;
     }
 
     arbol.construir(frecuencias);
 
-    // Abrir archivo.
+    // Abrir archivo binario de salida.
     ofstream archivo(nombreArchivo, ios::binary);
     if (!archivo.is_open()) {
-        cout << "[ERROR] Problemas guardando en '" << nombreArchivo << "'." << endl;
+        cout << "[ERROR] No se pudo crear el archivo '" << nombreArchivo << "'." << endl;
         return;
     }
 
-    // Se escribe el número de bases.
+    // Escribir número de bases (n).
     archivo.write(reinterpret_cast<const char*>(&numBases), sizeof(numBases));
 
-
-    // Escribir bases con su frecuencia según el mapa.
-    map<char, int>::iterator itFrec = frecuencias.begin();
-    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); ++itFrec) {
-        char base = itFrec->first;               // Ejemplo: 'A', 'C', 'G', 'T'
-        int frec = itFrec->second;     // Frecuencia asociada a la base
-
-        if (frec < 0) {
-            frec = 0; // Seguridad
-        }
-
-        uint8_t ci = static_cast<uint8_t>(static_cast<unsigned char>(base));
-        uint64_t fi = static_cast<uint64_t>(frec);
-
+    // Escribir pares (ci, fi).
+    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); itFrec++) {
+        uint8_t ci = static_cast<uint8_t>(itFrec->first);
+        uint64_t fi = static_cast<uint64_t>(itFrec->second);
         archivo.write(reinterpret_cast<const char*>(&ci), sizeof(ci));
         archivo.write(reinterpret_cast<const char*>(&fi), sizeof(fi));
+    }
 
-        if (!archivo) {
-            cerr << "Error al escribir par (ci, fi) para la base: " << base << "\n";
-            archivo.close();
-            return;
-        }
-    }   
-
-    //Se escribe el numero de secuencias
+    // Escribir número de secuencias (ns).
     archivo.write(reinterpret_cast<const char*>(&numSecuencias), sizeof(numSecuencias));
-    if (!archivo) {
-        std::cerr << "Error al escribir el número de secuencias.\n";
-        archivo.close();
-        return;
-    }
 
-    // Recorrer las secuencias y guardarlas en el archivo
-    vector<Secuencia>::iterator itSec;
-    vector<char> bases;
-    string secuenciaSinCodificar;
-    string secuenciaCodificada;
-
-    // Debug: Mostrar los códigos generados
+    // Mostrar los códigos de Huffman generados (debug).
     map<char, string> codigos = arbol.obtenerCodigos();
-    cout << "Códigos de Huffman generados:\n";
-    for (const auto& par : codigos) {
-        cout << "'" << (par.first ? par.first : '.') << "': " << par.second << "\n";
+    map<char, string>::iterator itCodigo;
+    cout << endl << "Códigos de Huffman generados: " << endl;
+    for (itCodigo = codigos.begin(); itCodigo != codigos.end(); itCodigo++) {
+        cout << "'" << itCodigo->first << "': " << itCodigo->second << endl;
     }
 
-    for (itSec = secuencias.begin(); itSec != secuencias.end(); ++itSec) {
-        // 1️⃣ Obtener las bases sin codificar
-        bases = itSec->getBases();
-        secuenciaSinCodificar = string(bases.begin(), bases.end());
-
-        // 2️⃣ Codificar usando el árbol de Huffman
-        secuenciaCodificada = arbol.codificar(secuenciaSinCodificar);
-
-        // 3️⃣ Guardar la descripción de la secuencia (longitud + texto)
+    // Recorrer las secuencias y guardarlas.
+    vector<Secuencia>::iterator itSec;
+    for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
+        // Obtener descripción y bases.
         string descripcion = itSec->getDescripcion();
-        uint16_t tamDescripcion = static_cast<uint16_t>(descripcion.size());
-        archivo.write(reinterpret_cast<const char*>(&tamDescripcion), sizeof(tamDescripcion));
-        archivo.write(descripcion.c_str(), tamDescripcion);
+        vector<char> bases = itSec->getBases();
+        string texto(bases.begin(), bases.end());
 
-        // 4️⃣ Guardar la longitud de la secuencia codificada (en bits o bytes, según tu diseño)
-        uint32_t tamCodificada = static_cast<uint32_t>(secuenciaCodificada.size());
-        archivo.write(reinterpret_cast<const char*>(&tamCodificada), sizeof(tamCodificada));
+        // Codificar usando Huffman.
+        string bits = arbol.codificar(texto);
 
-        // 5️⃣ Guardar la secuencia codificada (como texto binario)
-        archivo.write(secuenciaCodificada.c_str(), tamCodificada);
+        // Empaquetar bits a bytes (binary_code).
+        vector<uint8_t> bytes;
+        for (size_t i = 0; i < bits.size(); i += 8) {
+            string bloque = bits.substr(i, 8);
+            while (bloque.size() < 8) {
+                bloque.push_back('0');
+            }
+            
+            uint8_t byte = 0;
+            for (int b = 0; b < 8; b++) {
+                if (bloque[b] == '1') {
+                    byte |= (1 << (7 - b));
+                }
+            }
+            bytes.push_back(byte);
+        }
 
-        // 6️⃣ Verificación
+        // Campos según formato del enunciado.
+        uint16_t li = static_cast<uint16_t>(descripcion.size());
+        uint64_t vi = static_cast<uint64_t>(bits.size());
+        uint16_t xi = static_cast<uint16_t>(itSec->getAncho());
+
+        // Escribir: li, sij, vi, xi.
+        archivo.write(reinterpret_cast<const char*>(&li), sizeof(li));
+        archivo.write(descripcion.c_str(), li);
+        archivo.write(reinterpret_cast<const char*>(&vi), sizeof(vi));
+        archivo.write(reinterpret_cast<const char*>(&xi), sizeof(xi));
+
+        // Escribir la secuencia codificada empaquetada.
+        archivo.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+
+        // Validación.
         if (!archivo) {
-            cerr << "Error al escribir la secuencia: " << descripcion << "\n";
+            cout << "[ERROR] Fallo al escribir la secuencia '" << descripcion << "'." << endl;
             archivo.close();
             return;
         }
     }
+
+    archivo.close();
+    cout << endl << "[OK] Archivo '" << nombreArchivo << "' generado exitosamente según formato .fabin." << endl;
 }
 
 // Cargar un archivo .fabin y decodificar las secuencias.
 void Sistema::cargarCodificacion(string nombreArchivo) {
-    // Validar extensión
+    // Validar extensión .fabin.
     if (!validarExtensionFABIN(nombreArchivo)) {
         cout << "[ERROR] '" << nombreArchivo << "' no es un archivo .fabin válido." << endl;
         return;
     }
 
+    // Abrir archivo binario de entrada.
     ifstream archivo(nombreArchivo, ios::binary);
     if (!archivo.is_open()) {
-        cout << "[ERROR] '" << nombreArchivo << "' no se encuentra o no puede leerse." << endl;
+        cout << "[ERROR] No se pudo abrir '" << nombreArchivo << "'." << endl;
         return;
     }
 
-    // Limpiar datos previos
+    // Limpiar estructuras anteriores.
     frecuencias.clear();
     fasta = FASTA();
 
-    // 1️⃣ Leer el número de bases
-    uint16_t numBases;
+    // Leer número de bases (n).
+    uint16_t numBases = 0;
     archivo.read(reinterpret_cast<char*>(&numBases), sizeof(numBases));
-
     if (!archivo) {
         cout << "[ERROR] No se pudo leer el número de bases." << endl;
         archivo.close();
         return;
     }
 
-    // 2️⃣ Leer pares (base, frecuencia)
-    for (int i = 0; i < numBases; ++i) {
-        uint8_t ci;
-        uint64_t fi;
+    // Leer pares (ci, fi).
+    for (int i = 0; i < numBases; i++) {
+        uint8_t ci = 0;
+        uint64_t fi = 0;
         archivo.read(reinterpret_cast<char*>(&ci), sizeof(ci));
         archivo.read(reinterpret_cast<char*>(&fi), sizeof(fi));
 
@@ -392,55 +391,88 @@ void Sistema::cargarCodificacion(string nombreArchivo) {
         frecuencias[base] = static_cast<int>(fi);
     }
 
-    cout << "[OK] Mapa de frecuencias leído correctamente.\n";
-    for (auto &par : frecuencias) {
-        cout << par.first << " : " << par.second << endl;
+    // Mostrar mapa de frecuencias leído (debug).
+    cout << "[OK] Frecuencias leídas correctamente: " << endl;
+    map<char, int>::iterator it;
+    for (it = frecuencias.begin(); it != frecuencias.end(); it++) {
+        cout << "'" << it->first << "': " << it->second << endl;
     }
 
-    // 3️⃣ Reconstruir el árbol Huffman
-    cout << "Reconstruyendo árbol de Huffman...\n";
+    // Reconstruir árbol de Huffman.
     arbol.construir(frecuencias);
+    cout << "[OK] Árbol de Huffman reconstruido." << endl;
 
-    // 4️⃣ Leer número de secuencias
-    uint32_t numSecuencias;
+    // Leer número de secuencias (ns).
+    uint32_t numSecuencias = 0;
     archivo.read(reinterpret_cast<char*>(&numSecuencias), sizeof(numSecuencias));
+    if (!archivo) {
+        cout << "[ERROR] No se pudo leer el número de secuencias." << endl;
+        archivo.close();
+        return;
+    }
 
-    cout << "[OK] Número de secuencias: " << numSecuencias << endl;
+    cout << "[OK] Se encontraron " << numSecuencias << " secuencias codificadas." << endl;
 
-    // 5️⃣ Leer cada secuencia
-    int contador = 0;
-    for (uint32_t i = 0; i < numSecuencias; ++i) {
-        // Longitud de la descripción
-        uint16_t tamDescripcion;
-        archivo.read(reinterpret_cast<char*>(&tamDescripcion), sizeof(tamDescripcion));
+    // Leer cada secuencia.
+    for (uint32_t i = 0; i < numSecuencias; i++) {
+        uint16_t li = 0;
+        archivo.read(reinterpret_cast<char*>(&li), sizeof(li));
 
-        // Descripción
-        string descripcion(tamDescripcion, '\0');
-        archivo.read(&descripcion[0], tamDescripcion);
+        // Leer nombre (sij).
+        string descripcion(li, '\0');
+        archivo.read(&descripcion[0], li);
 
-        // Longitud de la secuencia codificada
-        uint32_t tamCodificada;
-        archivo.read(reinterpret_cast<char*>(&tamCodificada), sizeof(tamCodificada));
+        // Leer longitud (vi).
+        uint64_t vi = 0;
+        archivo.read(reinterpret_cast<char*>(&vi), sizeof(vi));
 
-        // Secuencia codificada
-        string secuenciaCodificada(tamCodificada, '\0');
-        archivo.read(&secuenciaCodificada[0], tamCodificada);
+        // Leer ancho (xi).
+        uint16_t xi = 0;
+        archivo.read(reinterpret_cast<char*>(&xi), sizeof(xi));
 
-        cout << "Decodificando secuencia: " << descripcion << " (" << tamCodificada << " bits)\n";
+        // Calcular cuántos bytes ocupa el código binario.
+        uint64_t numBytes = (vi + 7) / 8;
+        vector<uint8_t> bytes(numBytes);
+        archivo.read(reinterpret_cast<char*>(&bytes[0]), numBytes);
 
-        // 6️⃣ Decodificar usando el árbol
-        string secuenciaDecodificada = arbol.decodificar(secuenciaCodificada);
+        if (!archivo) {
+            cout << "[ERROR] Error al leer los datos de la secuencia " << descripcion << endl;
+            archivo.close();
+            return;
+        }
 
-        // 7️⃣ Guardar en el sistema FASTA
+        // Desempaquetar los bits del binary_code a una cadena.
+        string bits;
+        bits.reserve(vi);
+        for (uint64_t b = 0; b < numBytes; b++) {
+            for (int k = 7; k >= 0; k--) {
+                if (((bytes[b] >> k) & 1)) {
+                    bits.push_back('1');
+                } else {
+                    bits.push_back('0');
+                }
+            }
+        }
+
+        // Si el último byte tenía bits de relleno, recortamos.
+        if (bits.size() > vi) {
+            bits.resize(vi);
+        }
+
+        // Decodificar con el árbol Huffman.
+        string secuenciaDecodificada = arbol.decodificar(bits);
+
+        // Guardar en el sistema FASTA.
         vector<char> bases(secuenciaDecodificada.begin(), secuenciaDecodificada.end());
-        int ancho = 70; // Puedes ajustarlo según tus necesidades
-        guardarSecuencia(descripcion, bases, ancho, contador);
+        int contador = static_cast<int>(i);
+        guardarSecuencia(descripcion, bases, xi, contador);
+
+        cout << "[OK] Secuencia '" << descripcion << "' decodificada. " << "Longitud: " << vi << " bits (" << bases.size() << " bases) ." << endl;
     }
 
     archivo.close();
-    cout << "[OK] Archivo '" << nombreArchivo << "' decodificado exitosamente." << endl;
+    cout << endl << "[OK] Archivo '" << nombreArchivo << "' decodificado exitosamente." << endl;
 }
-
 
 // Devuelve una referencia al objeto que pertenece al Sistema.
 FASTA& Sistema::getFASTA() {

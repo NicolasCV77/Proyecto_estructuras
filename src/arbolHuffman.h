@@ -9,10 +9,14 @@ using namespace std;
 
 // Comparador de nodos, el menor valor de frecuencia tiene mayor prioridad.
 struct ComparadorNodos {
-    bool operator()(nodoHuffman* a, nodoHuffman* b) const {
+    bool operator()(nodoHuffman* a, nodoHuffman* b) {
+        if (a->obtenerFrecuencia() == b->obtenerFrecuencia()) {
+            return a->obtenerSimbolo() > b->obtenerSimbolo();
+        }
         return a->obtenerFrecuencia() > b->obtenerFrecuencia();
     }
 };
+
 
 // Clase Árbol de Huffman.
 class arbolHuffman {

@@ -3,6 +3,7 @@
 
 using namespace std;
 
+// Constructores.
 nodoHuffman::nodoHuffman() {
     this->hijoIzq = nullptr;
     this->hijoDer = nullptr;
@@ -15,6 +16,7 @@ nodoHuffman::nodoHuffman(int frecuencia, char simbolo) {
     this->hijoDer = nullptr;
 }
 
+// Destructor.
 nodoHuffman::~nodoHuffman() {
     if (this->hijoIzq != nullptr) {
         delete this->hijoIzq;
@@ -24,6 +26,7 @@ nodoHuffman::~nodoHuffman() {
     }
 }
 
+// Métodos de acceso.
 int nodoHuffman::obtenerFrecuencia() {
     return this->frecuencia;
 }
@@ -60,6 +63,7 @@ bool nodoHuffman::esHoja() {
     return (this->hijoIzq == nullptr && this->hijoDer == nullptr);
 }
 
+// Mostrar el nodo y sus hijos en preorden.
 void nodoHuffman::preOrden() {
     cout << "Simbolo: " << this->simbolo << ", Frecuencia: " << this->frecuencia << endl;
     if (this->hijoIzq != nullptr) {

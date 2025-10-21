@@ -248,7 +248,6 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     // Obtener secuencias del sistema.
     vector<Secuencia> secuencias = fasta.getSecuencias();
     uint32_t numSecuencias = static_cast<uint32_t> (secuencias.size());
-    uint16_t numBases = static_cast<uint16_t> (frecuencias.size());
 
     // Verificar que hayan secuencias para codificar.
     if (numSecuencias == 0) {
@@ -257,7 +256,16 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     }
 
     // Primeros pasos para realizar el archivo codificado.
+    frecuencias.clear();
     generarMapFrecuencia();
+    uint16_t numBases = static_cast<uint16_t> (frecuencias.size());
+
+    // Debug
+    cout << "[OK] Mapa de frecuencias generado correctamente.\n";
+    for (auto &p : frecuencias) {
+        cout << (int)p.first << " [" << p.first << "]: " << p.second << endl;
+    }
+
     arbol.construir(frecuencias);
 
     // Abrir archivo.
@@ -270,11 +278,6 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     // Se escribe el número de bases.
     archivo.write(reinterpret_cast<const char*>(&numBases), sizeof(numBases));
 
-    if (!archivo) {
-        cout << "[ERROR] Error al escribir el número de bases." << endl;
-        archivo.close();
-        return;
-    }
 
     // Escribir bases con su frecuencia según el mapa.
     map<char, int>::iterator itFrec = frecuencias.begin();

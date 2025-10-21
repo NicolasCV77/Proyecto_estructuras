@@ -174,21 +174,12 @@ void Menu::comandoSalir(const string&, const string&) {
 
 // Exportar secuencias en un formato binario personalizado.
 void Menu::comandoCodificar(const string& arg1, const string&) {
-    if (arg1.empty()) {
-        cout << "[ERROR] Uso: codificar nombre_archivo.fabin" << endl;
-        return;
-    }else{
-        sistema.guardarCodificacion(arg1);
-    }
+    sistema.guardarCodificacion(arg1);
 }
 
 // Importar un archivo binario al formato FASTA.
 void Menu::comandoDecodificar(const string& arg1, const string&) {
-    if (arg1.empty()) {
-        cout << "[ERROR] Uso: decodificar nombre_archivo.fabin" << endl;
-        return;
-    }
-    cout << "[OK] Archivo '" << arg1 << "' decodificado (implementación pendiente)." << endl;
+    sistema.cargarCodificacion(arg1);
 }
 
 // Encontrar la ruta más corta entre secuencias.

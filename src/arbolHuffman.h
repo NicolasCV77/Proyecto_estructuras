@@ -7,8 +7,12 @@
 
 using namespace std;
 
-// Alias para el tipo de función comparadora.
-typedef bool (*Comparador)(nodoHuffman*, nodoHuffman*);
+// Comparador de nodos, el menor valor de frecuencia tiene mayor prioridad.
+struct ComparadorNodos {
+    bool operator()(nodoHuffman* a, nodoHuffman* b) const {
+        return a->obtenerFrecuencia() > b->obtenerFrecuencia();
+    }
+};
 
 // Clase Árbol de Huffman.
 class arbolHuffman {
@@ -21,7 +25,6 @@ class arbolHuffman {
         // Funciones auxiliares.
         void generarCodigos(nodoHuffman *nodo, string &codigoActual);
         void destruirArbol(nodoHuffman *nodo);
-        bool compararNodos(nodoHuffman* a, nodoHuffman* b);
 
     public:
         arbolHuffman();

@@ -1,5 +1,6 @@
 #include "arbolHuffman.h"
 #include "queue"
+#include "iostream"
 
 using namespace std;
 
@@ -34,11 +35,6 @@ void arbolHuffman::destruirArbol(nodoHuffman *nodo) {
     }
 }
 
-// Comparador para la cola de prioridad.
-bool arbolHuffman::compararNodos(nodoHuffman *a, nodoHuffman *b) {
-    return a->obtenerFrecuencia() > b->obtenerFrecuencia();
-}
-
 // Constructor y destructor.
 arbolHuffman::arbolHuffman() {
     this->raiz = NULL;
@@ -59,7 +55,7 @@ bool arbolHuffman::esVacio() {
 // Construir el árbol de Huffman a partir de las frecuencias dadas.
 void arbolHuffman::construir(map<char, int> &frecuencias) {
     // Declarar la cola de prioridad usando el comparador.
-    priority_queue<nodoHuffman*, vector<nodoHuffman*>, Comparador> cola;
+    priority_queue<nodoHuffman*, vector<nodoHuffman*>, ComparadorNodos> cola;
 
     // Crear un nodo hoja para cada símbolo y agregarlo a la cola.
     map<char, int>::iterator it;

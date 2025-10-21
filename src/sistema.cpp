@@ -8,6 +8,11 @@ bool Sistema::validarExtensionFA(string& nombreArchivo) {
     return (nombreArchivo.rfind(".fa") == nombreArchivo.size() - 3);
 }
 
+// Validar extensión .fabin del archivo.
+bool Sistema::validarExtensionFABIN(string& nombreArchivo) {
+    return (nombreArchivo.rfind(".fabin") == nombreArchivo.size() - 6);
+}
+
 // Validar el ancho de cada una de las líneas.
 bool Sistema::validarLineas(vector<string>& lineas, string& descripcion, int ancho) {
     // Recorremos todas las líneas guardadas.
@@ -215,56 +220,63 @@ void Sistema::guardarArchivo(string nombreArchivo) {
     cout << "Las secuencias han sido guardadas en '" << nombreArchivo << "'." << endl;
 }
 
-void Sistema::generarMapFrecuencia(){
-    vector<Secuencia> secuencias = fasta.getSecuencias();
+// Generar el mapa de frecuencias a partir de las secuencias cargadas.
+void Sistema::generarMapFrecuencia() {
+    vector<Secuencia>& secuencias = fasta.getSecuencias();
+    vector<char> secuencia;
     vector<Secuencia>::iterator it;
-    vector<char>:: iterator itBase;
+    vector<char>::iterator itBase;
 
-    for (it = secuencias.begin(); it != secuencias.end(); ++it) {
-        cout << "Procesando secuencia..." << endl;
-        vector<char> secuencia = it->getBases();
-        cout << "Bases: " << secuencia.size() << endl;
-        for (itBase = secuencia.begin(); itBase != secuencia.end(); ++itBase) {
+    for (it = secuencias.begin(); it != secuencias.end(); it++) {
+        secuencia = it->getBases();
+        for (itBase = secuencia.begin(); itBase != secuencia.end(); itBase++) {
             frecuencias[*itBase]++;
-            cout << *itBase ;
         }
     }
+
+    cout << "[OK] Mapa de frecuencias generado correctamente." << endl;
 }
 
-
-
+// Codificar las secuencias y guardarlas en un archivo .fabin
 void Sistema::guardarCodificacion(string nombreArchivo) {
-    
-    vector<Secuencia>secuencias = fasta.getSecuencias();
-    uint32_t numSecuencias = static_cast<uint32_t>(secuencias.size());
-    uint16_t numBases = static_cast<uint16_t>(frecuencias.size());
-    //Verificar que hayan secuencias para codificar
-    if(numSecuencias==0){
-        cout << "No hay secuencias cargadas, vualva a intentarlo" << endl;
+    // Validar extensión.
+    if (!validarExtensionFABIN(nombreArchivo)) {
+        cout << "[ERROR] '" << nombreArchivo << "' no es un archivo .fabin válido." << endl;
         return;
     }
 
-    //Primeros paso para realizar el archivo codificado
+    // Obtener secuencias del sistema.
+    vector<Secuencia> secuencias = fasta.getSecuencias();
+    uint32_t numSecuencias = static_cast<uint32_t> (secuencias.size());
+    uint16_t numBases = static_cast<uint16_t> (frecuencias.size());
+
+    // Verificar que hayan secuencias para codificar.
+    if (numSecuencias == 0) {
+        cout << "No hay secuencias cargadas, vuelva a intentarlo" << endl;
+        return;
+    }
+
+    // Primeros pasos para realizar el archivo codificado.
     generarMapFrecuencia();
     arbol.construir(frecuencias);
 
-    cout << "hola" <<endl;
-    //Abriri archivo
+    // Abrir archivo.
     ofstream archivo(nombreArchivo, ios::binary);
     if (!archivo.is_open()) {
-        std::cerr << "Error: no se pudo abrir " << nombreArchivo << " para escritura.\n";
+        cout << "[ERROR] Problemas guardando en '" << nombreArchivo << "'." << endl;
         return;
     }
 
-    //Se escribe el numero de bases
+    // Se escribe el número de bases.
     archivo.write(reinterpret_cast<const char*>(&numBases), sizeof(numBases));
+
     if (!archivo) {
-        std::cerr << "Error al escribir el número de bases.\n";
+        cout << "[ERROR] Error al escribir el número de bases." << endl;
         archivo.close();
         return;
     }
-    
-    //Escribir bases con su frecuencia segun el map
+
+    // Escribir bases con su frecuencia según el mapa.
     map<char, int>::iterator itFrec = frecuencias.begin();
     for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); ++itFrec) {
         char base = itFrec->first;               // Ejemplo: 'A', 'C', 'G', 'T'
@@ -301,6 +313,13 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     string secuenciaSinCodificar;
     string secuenciaCodificada;
 
+    // Debug: Mostrar los códigos generados
+    map<char, string> codigos = arbol.obtenerCodigos();
+    cout << "Códigos de Huffman generados:\n";
+    for (const auto& par : codigos) {
+        cout << "'" << (par.first ? par.first : '.') << "': " << par.second << "\n";
+    }
+
     for (itSec = secuencias.begin(); itSec != secuencias.end(); ++itSec) {
         // 1️⃣ Obtener las bases sin codificar
         bases = itSec->getBases();
@@ -331,6 +350,93 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     }
 }
 
+// Cargar un archivo .fabin y decodificar las secuencias.
+void Sistema::cargarCodificacion(string nombreArchivo) {
+    // Validar extensión
+    if (!validarExtensionFABIN(nombreArchivo)) {
+        cout << "[ERROR] '" << nombreArchivo << "' no es un archivo .fabin válido." << endl;
+        return;
+    }
+
+    ifstream archivo(nombreArchivo, ios::binary);
+    if (!archivo.is_open()) {
+        cout << "[ERROR] '" << nombreArchivo << "' no se encuentra o no puede leerse." << endl;
+        return;
+    }
+
+    // Limpiar datos previos
+    frecuencias.clear();
+    fasta = FASTA();
+
+    // 1️⃣ Leer el número de bases
+    uint16_t numBases;
+    archivo.read(reinterpret_cast<char*>(&numBases), sizeof(numBases));
+
+    if (!archivo) {
+        cout << "[ERROR] No se pudo leer el número de bases." << endl;
+        archivo.close();
+        return;
+    }
+
+    // 2️⃣ Leer pares (base, frecuencia)
+    for (int i = 0; i < numBases; ++i) {
+        uint8_t ci;
+        uint64_t fi;
+        archivo.read(reinterpret_cast<char*>(&ci), sizeof(ci));
+        archivo.read(reinterpret_cast<char*>(&fi), sizeof(fi));
+
+        char base = static_cast<char>(ci);
+        frecuencias[base] = static_cast<int>(fi);
+    }
+
+    cout << "[OK] Mapa de frecuencias leído correctamente.\n";
+    for (auto &par : frecuencias) {
+        cout << par.first << " : " << par.second << endl;
+    }
+
+    // 3️⃣ Reconstruir el árbol Huffman
+    cout << "Reconstruyendo árbol de Huffman...\n";
+    arbol.construir(frecuencias);
+
+    // 4️⃣ Leer número de secuencias
+    uint32_t numSecuencias;
+    archivo.read(reinterpret_cast<char*>(&numSecuencias), sizeof(numSecuencias));
+
+    cout << "[OK] Número de secuencias: " << numSecuencias << endl;
+
+    // 5️⃣ Leer cada secuencia
+    int contador = 0;
+    for (uint32_t i = 0; i < numSecuencias; ++i) {
+        // Longitud de la descripción
+        uint16_t tamDescripcion;
+        archivo.read(reinterpret_cast<char*>(&tamDescripcion), sizeof(tamDescripcion));
+
+        // Descripción
+        string descripcion(tamDescripcion, '\0');
+        archivo.read(&descripcion[0], tamDescripcion);
+
+        // Longitud de la secuencia codificada
+        uint32_t tamCodificada;
+        archivo.read(reinterpret_cast<char*>(&tamCodificada), sizeof(tamCodificada));
+
+        // Secuencia codificada
+        string secuenciaCodificada(tamCodificada, '\0');
+        archivo.read(&secuenciaCodificada[0], tamCodificada);
+
+        cout << "Decodificando secuencia: " << descripcion << " (" << tamCodificada << " bits)\n";
+
+        // 6️⃣ Decodificar usando el árbol
+        string secuenciaDecodificada = arbol.decodificar(secuenciaCodificada);
+
+        // 7️⃣ Guardar en el sistema FASTA
+        vector<char> bases(secuenciaDecodificada.begin(), secuenciaDecodificada.end());
+        int ancho = 70; // Puedes ajustarlo según tus necesidades
+        guardarSecuencia(descripcion, bases, ancho, contador);
+    }
+
+    archivo.close();
+    cout << "[OK] Archivo '" << nombreArchivo << "' decodificado exitosamente." << endl;
+}
 
 
 // Devuelve una referencia al objeto que pertenece al Sistema.

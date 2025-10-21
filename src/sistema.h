@@ -21,6 +21,7 @@ class Sistema {
 
         // Funciones auxiliares.
         bool validarExtensionFA(string& nombreArchivo);
+        bool validarExtensionFABIN(string& nombreArchivo);
         bool validarLineas(vector<string>& lineas, string& descripcion, int ancho);
         bool validarBases(string& linea, string& descripcion, vector<char>& bases);
         void guardarSecuencia(string& descripcion, vector<char>& bases, int ancho, int& contador);
@@ -33,10 +34,8 @@ class Sistema {
 
         //Codificación y decodificacion
         void generarMapFrecuencia();
-        void codificar(string nombreArchivo);
-        void decodificar();
-
         void guardarCodificacion(string nombreArchivo);
+        void cargarCodificacion(string nombreArchivo);
 
         // Referencia del objeto FASTA.
         FASTA& getFASTA();

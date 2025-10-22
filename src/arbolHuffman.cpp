@@ -26,26 +26,14 @@ void arbolHuffman::generarCodigos(nodoHuffman *nodo, string &codigoActual) {
     codigoActual.pop_back();
 }
 
-// Función auxiliar para destruir el árbol.
-void arbolHuffman::destruirArbol(nodoHuffman *nodo) {
-    if (nodo != NULL) {
-        destruirArbol(nodo->obtenerHijoIzq());
-        destruirArbol(nodo->obtenerHijoDer());
-        delete nodo;
-    }
-}
+
 
 // Constructor y destructor.
 arbolHuffman::arbolHuffman() {
     this->raiz = NULL;
 }
 
-arbolHuffman::~arbolHuffman() {
-    if (this->raiz != NULL) {
-        delete this->raiz;
-        this->raiz = NULL;
-    }
-}
+
 
 // Verificar si el árbol está vacío.
 bool arbolHuffman::esVacio() {
@@ -124,11 +112,4 @@ string arbolHuffman::decodificar(string &textoCodificado) {
     }
 
     return textoDecodificado;
-}
-
-// Mostrar el árbol en preorden.
-void arbolHuffman::mostrarPreOrden () {
-    if(!this->esVacio()) {
-        (this->raiz)->preOrden();
-    }
 }

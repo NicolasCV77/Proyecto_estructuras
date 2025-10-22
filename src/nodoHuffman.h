@@ -8,7 +8,6 @@ class nodoHuffman {
         char simbolo;
         nodoHuffman *hijoIzq;
         nodoHuffman *hijoDer;
-
     public:
         nodoHuffman();
         nodoHuffman(int frecuencia, char simbolo);

@@ -24,21 +24,14 @@ class arbolHuffman {
         nodoHuffman *raiz;
         // Mapa de códigos de Huffman.
         map<char, string> codigos;
-
-        // Funciones auxiliares.
-        void generarCodigos(nodoHuffman *nodo, string &codigoActual);
-        void destruirArbol(nodoHuffman *nodo);
-
     public:
+        void generarCodigos(nodoHuffman *nodo, string &codigoActual);
         arbolHuffman();
-        ~arbolHuffman();
         bool esVacio();
         void construir(map<char, int> &frecuencias);
         map<char, string> obtenerCodigos();
         string codificar(string &texto);
         string decodificar(string &textoCodificado);
-        void mostrarPreOrden();
-
 };
 
 #endif

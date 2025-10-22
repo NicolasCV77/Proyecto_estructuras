@@ -18,7 +18,7 @@ class Sistema {
         FASTA fasta;
         map<char, int> frecuencias;
         arbolHuffman arbol;
-
+    public:
         // Funciones auxiliares.
         bool validarExtensionFA(string& nombreArchivo);
         bool validarExtensionFABIN(string& nombreArchivo);
@@ -27,7 +27,6 @@ class Sistema {
         void guardarSecuencia(string& descripcion, vector<char>& bases, int ancho, int& contador);
         void escribirSecuencia(ofstream& archivo, vector<Secuencia>::iterator it);
 
-    public:
         // Manejo de archivos. 
         void cargarArchivo(string nombreArchivo);
         void guardarArchivo(string nombreArchivo);

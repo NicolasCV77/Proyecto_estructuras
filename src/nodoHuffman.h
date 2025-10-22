@@ -11,7 +11,6 @@ class nodoHuffman {
     public:
         nodoHuffman();
         nodoHuffman(int frecuencia, char simbolo);
-        ~nodoHuffman();
         int obtenerFrecuencia();
         void fijarFrecuencia(int frecuencia);
         char obtenerSimbolo();
@@ -21,7 +20,6 @@ class nodoHuffman {
         void fijarHijoIzq(nodoHuffman *izq);
         void fijarHijoDer(nodoHuffman *der);
         bool esHoja();
-        void preOrden();
 
 };
 

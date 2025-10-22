@@ -16,15 +16,6 @@ nodoHuffman::nodoHuffman(int frecuencia, char simbolo) {
     this->hijoDer = nullptr;
 }
 
-// Destructor.
-nodoHuffman::~nodoHuffman() {
-    if (this->hijoIzq != nullptr) {
-        delete this->hijoIzq;
-    }
-    if (this->hijoDer != nullptr) {
-        delete this->hijoDer;
-    }
-}
 
 // Métodos de acceso.
 int nodoHuffman::obtenerFrecuencia() {
@@ -61,16 +52,4 @@ void nodoHuffman::fijarHijoDer(nodoHuffman *der) {
 
 bool nodoHuffman::esHoja() {
     return (this->hijoIzq == nullptr && this->hijoDer == nullptr);
-}
-
-// Mostrar el nodo y sus hijos en preorden.
-void nodoHuffman::preOrden() {
-    cout << "Simbolo: " << this->simbolo << ", Frecuencia: " << this->frecuencia << endl;
-    if (this->hijoIzq != nullptr) {
-        this->hijoIzq->preOrden();
-    }
-
-    if (this->hijoDer != nullptr) {
-        this->hijoDer->preOrden();
-    }
 }

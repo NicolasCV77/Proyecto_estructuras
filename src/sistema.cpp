@@ -39,7 +39,6 @@ bool Sistema::validarBases(string& linea, string& descripcion, vector<char>& bas
     for (int i = 0; i < linea.size(); i++) {
         char base = linea[i];
         bool valida = false;
-
         // Recorremos todos los componentes dentro del sistema.
         vector<vector<char>>::iterator itComponentes;
         for (itComponentes = fasta.getComponentes().begin(); itComponentes != fasta.getComponentes().end(); itComponentes++) {
@@ -51,7 +50,7 @@ bool Sistema::validarBases(string& linea, string& descripcion, vector<char>& bas
 
         // No se encontró dentro del sistema.
         if (!valida) {
-            cout << "[ERROR] Base inválida '" << base << "' encontrada en la secuencia '" << descripcion << "'." << endl;
+            cout << "[ERROR] Base inválida: '" << base << "' encontrada en la secuencia '" << descripcion << "'." << endl;
             return false;
         }
 
@@ -120,6 +119,12 @@ void Sistema::cargarArchivo(string nombreArchivo) {
 
     // Leer archivo línea por línea.
     while (getline(archivo, linea)) {
+        for (int i = 0; i < linea.size(); i++) {
+            if (linea[i] == '\r') {
+                linea.erase(i, 1);
+                i--; // retroceder porque la cadena se acortó
+            }
+        }
         // Saltar líneas vacías.
         if (linea.empty()) {
             continue;
@@ -163,6 +168,7 @@ void Sistema::cargarArchivo(string nombreArchivo) {
                 return;
             }
         }
+        linea.clear();
     }
 
     // Guardar última secuencia si existe.

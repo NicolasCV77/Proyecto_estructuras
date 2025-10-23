@@ -119,12 +119,14 @@ void Sistema::cargarArchivo(string nombreArchivo) {
 
     // Leer archivo línea por línea.
     while (getline(archivo, linea)) {
+        // Eliminar caracteres '\r' si existen.
         for (int i = 0; i < linea.size(); i++) {
             if (linea[i] == '\r') {
                 linea.erase(i, 1);
-                i--; // retroceder porque la cadena se acortó
+                i--;
             }
         }
+
         // Saltar líneas vacías.
         if (linea.empty()) {
             continue;
@@ -253,10 +255,10 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     }
 
     // Obtener secuencias en memoria.
-    vector<Secuencia> secuencias = fasta.getSecuencias();
-    uint32_t numSecuencias = static_cast<uint32_t>(secuencias.size());
+    vector<Secuencia> listaSecuencias = fasta.getSecuencias();
+    uint32_t cantidadSecuencias = static_cast<uint32_t>(listaSecuencias.size());
 
-    if (numSecuencias == 0) {
+    if (cantidadSecuencias == 0) {
         cout << "[ERROR] No hay secuencias cargadas para codificar." << endl;
         return;
     }
@@ -264,13 +266,14 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
     // Generar mapa de frecuencias y construir árbol de Huffman.
     frecuencias.clear();
     generarMapFrecuencia();
-    uint16_t numBases = static_cast<uint16_t>(frecuencias.size());
+    uint16_t cantidadBasesUnicas = static_cast<uint16_t>(frecuencias.size());
 
-    // Mostrar mapa de frecuencias (debug).
-    cout << "[OK] Mapa de frecuencias generado correctamente:\n";
-    map<char, int>::iterator itFrec;
-    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); itFrec++) {
-        cout << "'" << itFrec->first << "' : " << itFrec->second << endl;
+    // Mostrar mapa de frecuencias.
+    cout << "[OK] Frecuencias calculadas correctamente: " << endl;
+    
+    map<char, int>::iterator iteradorFrecuencia;
+    for (iteradorFrecuencia = frecuencias.begin(); iteradorFrecuencia != frecuencias.end(); iteradorFrecuencia++) {
+        cout << "'" << iteradorFrecuencia->first << "' : " << iteradorFrecuencia->second << endl;
     }
 
     arbol.construir(frecuencias);
@@ -282,41 +285,42 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
         return;
     }
 
-    // Escribir número de bases (n).
-    archivo.write(reinterpret_cast<const char*>(&numBases), sizeof(numBases));
+    // Escribir número de bases únicas.
+    archivo.write(reinterpret_cast<const char*>(&cantidadBasesUnicas), sizeof(cantidadBasesUnicas));
 
-    // Escribir pares (ci, fi).
-    for (itFrec = frecuencias.begin(); itFrec != frecuencias.end(); itFrec++) {
-        uint8_t ci = static_cast<uint8_t>(itFrec->first);
-        uint64_t fi = static_cast<uint64_t>(itFrec->second);
-        archivo.write(reinterpret_cast<const char*>(&ci), sizeof(ci));
-        archivo.write(reinterpret_cast<const char*>(&fi), sizeof(fi));
+    // Escribir pares (base, frecuenciaBase).
+    for (iteradorFrecuencia = frecuencias.begin(); iteradorFrecuencia != frecuencias.end(); iteradorFrecuencia++) {
+        uint8_t baseActual = static_cast<uint8_t>(iteradorFrecuencia->first);
+        uint64_t frecuenciaBase = static_cast<uint64_t>(iteradorFrecuencia->second);
+        archivo.write(reinterpret_cast<const char*>(&baseActual), sizeof(baseActual));
+        archivo.write(reinterpret_cast<const char*>(&frecuenciaBase), sizeof(frecuenciaBase));
     }
 
-    // Escribir número de secuencias (ns).
-    archivo.write(reinterpret_cast<const char*>(&numSecuencias), sizeof(numSecuencias));
+    // Escribir número total de secuencias.
+    archivo.write(reinterpret_cast<const char*>(&cantidadSecuencias), sizeof(cantidadSecuencias));
 
-    // Mostrar los códigos de Huffman generados (debug).
-    map<char, string> codigos = arbol.obtenerCodigos();
-    map<char, string>::iterator itCodigo;
+    // Mostrar los códigos de Huffman generados.
     cout << endl << "Códigos de Huffman generados: " << endl;
-    for (itCodigo = codigos.begin(); itCodigo != codigos.end(); itCodigo++) {
-        cout << "'" << itCodigo->first << "': " << itCodigo->second << endl;
+
+    map<char, string> codigos = arbol.obtenerCodigos();
+    map<char, string>::iterator iteradorCodigo;
+    for (iteradorCodigo = codigos.begin(); iteradorCodigo != codigos.end(); iteradorCodigo++) {
+        cout << "'" << iteradorCodigo->first << "': " << iteradorCodigo->second << endl;
     }
 
     // Recorrer las secuencias y guardarlas.
-    vector<Secuencia>::iterator itSec;
-    for (itSec = secuencias.begin(); itSec != secuencias.end(); itSec++) {
+    vector<Secuencia>::iterator iteradorSecuencia;
+    for (iteradorSecuencia = listaSecuencias.begin(); iteradorSecuencia != listaSecuencias.end(); iteradorSecuencia++) {
         // Obtener descripción y bases.
-        string descripcion = itSec->getDescripcion();
-        vector<char> bases = itSec->getBases();
+        string descripcion = iteradorSecuencia->getDescripcion();
+        vector<char> bases = iteradorSecuencia->getBases();
         string texto(bases.begin(), bases.end());
 
         // Codificar usando Huffman.
         string bits = arbol.codificar(texto);
 
-        // Empaquetar bits a bytes (binary_code).
-        vector<uint8_t> bytes;
+        // Empaquetar bits a bytes.
+        vector<uint8_t> bytesCodificados;
         for (size_t i = 0; i < bits.size(); i += 8) {
             string bloque = bits.substr(i, 8);
             while (bloque.size() < 8) {
@@ -324,27 +328,30 @@ void Sistema::guardarCodificacion(string nombreArchivo) {
             }
             
             uint8_t byte = 0;
+            // Convertir bloque de 8 bits a un byte.
             for (int b = 0; b < 8; b++) {
                 if (bloque[b] == '1') {
-                    byte |= (1 << (7 - b));
+                    int posicionBit = 7 - b;
+                    uint8_t mascara = (1 << posicionBit);
+                    byte = byte + mascara;
                 }
             }
-            bytes.push_back(byte);
+            bytesCodificados.push_back(byte);
         }
 
         // Campos según formato del enunciado.
-        uint16_t li = static_cast<uint16_t>(descripcion.size());
-        uint64_t vi = static_cast<uint64_t>(bits.size());
-        uint16_t xi = static_cast<uint16_t>(itSec->getAncho());
+        uint16_t longitudDescripcion = static_cast<uint16_t>(descripcion.size());
+        uint64_t longitudBitsCodificados = static_cast<uint64_t>(bits.size());
+        uint16_t anchoSecuencia = static_cast<uint16_t>(iteradorSecuencia->getAncho());
 
-        // Escribir: li, sij, vi, xi.
-        archivo.write(reinterpret_cast<const char*>(&li), sizeof(li));
-        archivo.write(descripcion.c_str(), li);
-        archivo.write(reinterpret_cast<const char*>(&vi), sizeof(vi));
-        archivo.write(reinterpret_cast<const char*>(&xi), sizeof(xi));
+        // Escribir: longitudDescripcion, descripcion, longitudBitsCodificados, anchoSecuencia.
+        archivo.write(reinterpret_cast<const char*>(&longitudDescripcion), sizeof(longitudDescripcion));
+        archivo.write(descripcion.c_str(), longitudDescripcion);
+        archivo.write(reinterpret_cast<const char*>(&longitudBitsCodificados), sizeof(longitudBitsCodificados));
+        archivo.write(reinterpret_cast<const char*>(&anchoSecuencia), sizeof(anchoSecuencia));
 
         // Escribir la secuencia codificada empaquetada.
-        archivo.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+        archivo.write(reinterpret_cast<const char*>(bytesCodificados.data()), bytesCodificados.size());
 
         // Validación.
         if (!archivo) {
@@ -377,69 +384,71 @@ void Sistema::cargarCodificacion(string nombreArchivo) {
     frecuencias.clear();
     fasta = FASTA();
 
-    // Leer número de bases (n).
-    uint16_t numBases = 0;
-    archivo.read(reinterpret_cast<char*>(&numBases), sizeof(numBases));
+    // Leer número de bases únicas.
+    uint16_t cantidadBasesUnicas = 0;
+    archivo.read(reinterpret_cast<char*>(&cantidadBasesUnicas), sizeof(cantidadBasesUnicas));
     if (!archivo) {
         cout << "[ERROR] No se pudo leer el número de bases." << endl;
         archivo.close();
         return;
     }
 
-    // Leer pares (ci, fi).
-    for (int i = 0; i < numBases; i++) {
-        uint8_t ci = 0;
-        uint64_t fi = 0;
-        archivo.read(reinterpret_cast<char*>(&ci), sizeof(ci));
-        archivo.read(reinterpret_cast<char*>(&fi), sizeof(fi));
+    // Leer pares (baseActual, frecuenciaBase).
+    for (int i = 0; i < cantidadBasesUnicas; i++) {
+        uint8_t baseActual = 0;
+        uint64_t frecuenciaBase = 0;
+        archivo.read(reinterpret_cast<char*>(&baseActual), sizeof(baseActual));
+        archivo.read(reinterpret_cast<char*>(&frecuenciaBase), sizeof(frecuenciaBase));
 
-        char base = static_cast<char>(ci);
-        frecuencias[base] = static_cast<int>(fi);
+        char base = static_cast<char>(baseActual);
+        frecuencias[base] = static_cast<int>(frecuenciaBase);
     }
 
-    // Mostrar mapa de frecuencias leído (debug).
+    // Mostrar mapa de frecuencias leído.
     cout << "[OK] Frecuencias leídas correctamente: " << endl;
-    map<char, int>::iterator it;
-    for (it = frecuencias.begin(); it != frecuencias.end(); it++) {
-        cout << "'" << it->first << "': " << it->second << endl;
+
+    map<char, int>::iterator iteradorFrecuencia;
+    for (iteradorFrecuencia = frecuencias.begin(); iteradorFrecuencia != frecuencias.end(); iteradorFrecuencia++) {
+        cout << "'" << iteradorFrecuencia->first << "': " << iteradorFrecuencia->second << endl;
     }
 
     // Reconstruir árbol de Huffman.
     arbol.construir(frecuencias);
     cout << "[OK] Árbol de Huffman reconstruido." << endl;
 
-    // Leer número de secuencias (ns).
-    uint32_t numSecuencias = 0;
-    archivo.read(reinterpret_cast<char*>(&numSecuencias), sizeof(numSecuencias));
+    // Leer número de secuencias.
+    uint32_t cantidadSecuencias = 0;
+    archivo.read(reinterpret_cast<char*>(&cantidadSecuencias), sizeof(cantidadSecuencias));
     if (!archivo) {
         cout << "[ERROR] No se pudo leer el número de secuencias." << endl;
         archivo.close();
         return;
     }
 
-    cout << "[OK] Se encontraron " << numSecuencias << " secuencias codificadas." << endl;
+    cout << "[OK] Se encontraron " << cantidadSecuencias << " secuencias codificadas." << endl;
 
-    // Leer cada secuencia.
-    for (uint32_t i = 0; i < numSecuencias; i++) {
-        uint16_t li = 0;
-        archivo.read(reinterpret_cast<char*>(&li), sizeof(li));
+    // Leer cada secuencia codificada.
+    for (uint32_t i = 0; i < cantidadSecuencias; i++) {
+        // Leer longitud de la descripción.
+        uint16_t longitudDescripcion = 0;
+        archivo.read(reinterpret_cast<char*>(&longitudDescripcion), sizeof(longitudDescripcion));
 
-        // Leer nombre (sij).
-        string descripcion(li, '\0');
-        archivo.read(&descripcion[0], li);
+        // Leer descripción o nombre.
+        string descripcion(longitudDescripcion, '\0');
+        archivo.read(&descripcion[0], longitudDescripcion);
 
-        // Leer longitud (vi).
-        uint64_t vi = 0;
-        archivo.read(reinterpret_cast<char*>(&vi), sizeof(vi));
+        // Leer longitud en bits.
+        uint64_t longitudBitsCodificados = 0;
+        archivo.read(reinterpret_cast<char*>(&longitudBitsCodificados), sizeof(longitudBitsCodificados));
 
-        // Leer ancho (xi).
-        uint16_t xi = 0;
-        archivo.read(reinterpret_cast<char*>(&xi), sizeof(xi));
+        // Leer ancho original.
+        uint16_t anchoSecuencia = 0;
+        archivo.read(reinterpret_cast<char*>(&anchoSecuencia), sizeof(anchoSecuencia));
 
-        // Calcular cuántos bytes ocupa el código binario.
-        uint64_t numBytes = (vi + 7) / 8;
-        vector<uint8_t> bytes(numBytes);
-        archivo.read(reinterpret_cast<char*>(&bytes[0]), numBytes);
+        // Calcular bytes necesarios para almacenar los bits.
+        uint64_t cantidadBytesCodificados = (longitudBitsCodificados + 7) / 8;
+        vector<uint8_t> bytesCodificados(cantidadBytesCodificados);
+        archivo.read(reinterpret_cast<char*>(&bytesCodificados[0]), cantidadBytesCodificados);
 
         if (!archivo) {
             cout << "[ERROR] Error al leer los datos de la secuencia " << descripcion << endl;
@@ -447,33 +456,34 @@ void Sistema::cargarCodificacion(string nombreArchivo) {
             return;
         }
 
-        // Desempaquetar los bits del binary_code a una cadena.
-        string bits;
-        bits.reserve(vi);
-        for (uint64_t b = 0; b < numBytes; b++) {
+        // Desempaquetar los bits a una cadena.
+        string cadenaBits;
+        cadenaBits.reserve(longitudBitsCodificados);
+        for (uint64_t b = 0; b < cantidadBytesCodificados; b++) {
             for (int k = 7; k >= 0; k--) {
-                if (((bytes[b] >> k) & 1)) {
-                    bits.push_back('1');
+                if (((bytesCodificados[b] >> k) & 1)) {
+                    cadenaBits.push_back('1');
                 } else {
-                    bits.push_back('0');
+                    cadenaBits.push_back('0');
                 }
             }
         }
 
-        // Si el último byte tenía bits de relleno, recortamos.
-        if (bits.size() > vi) {
-            bits.resize(vi);
+        // Eliminar bits de relleno sobrantes.
+        if (cadenaBits.size() > longitudBitsCodificados) {
+            cadenaBits.resize(longitudBitsCodificados);
         }
 
-        // Decodificar con el árbol Huffman.
-        string secuenciaDecodificada = arbol.decodificar(bits);
+        // Decodificar usando el árbol Huffman.
+        string textoDecodificado = arbol.decodificar(cadenaBits);
 
         // Guardar en el sistema FASTA.
-        vector<char> bases(secuenciaDecodificada.begin(), secuenciaDecodificada.end());
-        int contador = static_cast<int>(i);
-        guardarSecuencia(descripcion, bases, xi, contador);
+        vector<char> bases(textoDecodificado.begin(), textoDecodificado.end());
+        int indiceSecuencia = static_cast<int>(i);
+        guardarSecuencia(descripcion, bases, anchoSecuencia, indiceSecuencia);
 
-        cout << "[OK] Secuencia '" << descripcion << "' decodificada. " << "Longitud: " << vi << " bits (" << bases.size() << " bases) ." << endl;
+        cout << "[OK] Secuencia '" << descripcion << "' decodificada. " << endl;
+        cout << "Longitud: " << longitudBitsCodificados << " bits (" << bases.size() << " bases)." << endl;
     }
 
     archivo.close();

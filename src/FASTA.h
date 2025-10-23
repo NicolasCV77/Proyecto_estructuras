@@ -38,6 +38,7 @@ class FASTA {
         vector<char> getEquivalencias(char base);
         vector<Secuencia>& getSecuencias();
         vector<vector<char>>& getComponentes();
+        
 };
 
 #endif

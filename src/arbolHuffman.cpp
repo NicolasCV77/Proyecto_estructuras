@@ -4,36 +4,10 @@
 
 using namespace std;
 
-// Función auxiliar para generar los códigos de Huffman.
-void arbolHuffman::generarCodigos(nodoHuffman *nodo, string &codigoActual) {
-    if (nodo == nullptr) {
-        return;
-    }
-
-    // Si es un nodo hoja, guardar el código.
-    if (nodo->esHoja()) {
-        codigos[nodo->obtenerSimbolo()] = codigoActual;
-    }
-
-    // Recorrer hijo izquierdo con '0' añadido al código.
-    codigoActual.push_back('0');
-    generarCodigos(nodo->obtenerHijoIzq(), codigoActual);
-    codigoActual.pop_back();
-
-    // Recorrer hijo derecho con '1' añadido al código.
-    codigoActual.push_back('1');
-    generarCodigos(nodo->obtenerHijoDer(), codigoActual);
-    codigoActual.pop_back();
-}
-
-
-
 // Constructor y destructor.
 arbolHuffman::arbolHuffman() {
     this->raiz = NULL;
 }
-
-
 
 // Verificar si el árbol está vacío.
 bool arbolHuffman::esVacio() {
@@ -112,4 +86,26 @@ string arbolHuffman::decodificar(string &textoCodificado) {
     }
 
     return textoDecodificado;
+}
+
+// Función auxiliar para generar los códigos de Huffman.
+void arbolHuffman::generarCodigos(nodoHuffman *nodo, string &codigoActual) {
+    if (nodo == nullptr) {
+        return;
+    }
+
+    // Si es un nodo hoja, guardar el código.
+    if (nodo->esHoja()) {
+        codigos[nodo->obtenerSimbolo()] = codigoActual;
+    }
+
+    // Recorrer hijo izquierdo con '0' añadido al código.
+    codigoActual.push_back('0');
+    generarCodigos(nodo->obtenerHijoIzq(), codigoActual);
+    codigoActual.pop_back();
+
+    // Recorrer hijo derecho con '1' añadido al código.
+    codigoActual.push_back('1');
+    generarCodigos(nodo->obtenerHijoDer(), codigoActual);
+    codigoActual.pop_back();
 }

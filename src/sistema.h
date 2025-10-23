@@ -18,6 +18,7 @@ class Sistema {
         FASTA fasta;
         map<char, int> frecuencias;
         arbolHuffman arbol;
+        
     public:
         // Funciones auxiliares.
         bool validarExtensionFA(string& nombreArchivo);
@@ -31,7 +32,7 @@ class Sistema {
         void cargarArchivo(string nombreArchivo);
         void guardarArchivo(string nombreArchivo);
 
-        //Codificación y decodificacion
+        //Codificación y decodificacion.
         void generarMapFrecuencia();
         void guardarCodificacion(string nombreArchivo);
         void cargarCodificacion(string nombreArchivo);

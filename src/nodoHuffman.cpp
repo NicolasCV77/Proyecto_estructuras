@@ -16,7 +16,6 @@ nodoHuffman::nodoHuffman(int frecuencia, char simbolo) {
     this->hijoDer = nullptr;
 }
 
-
 // Métodos de acceso.
 int nodoHuffman::obtenerFrecuencia() {
     return this->frecuencia;

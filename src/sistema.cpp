@@ -490,7 +490,185 @@ void Sistema::cargarCodificacion(string nombreArchivo) {
     cout << endl << "[OK] Archivo '" << nombreArchivo << "' decodificado exitosamente." << endl;
 }
 
-// Devuelve una referencia al objeto que pertenece al Sistema.
-FASTA& Sistema::getFASTA() {
-    return fasta;
+// Encontrar la ruta más corta entre dos coordenadas en una secuencia dada.
+void Sistema::rutaMasCorta(const string& descripcion, const string& i, const string& j, const string& x, const string& y) {
+    // Convertir coordenadas a enteros.
+    int filaInicio = stoi(i);
+    int columnaInicio = stoi(j);
+    int filaFin = stoi(x);
+    int columnaFin = stoi(y);
+
+    // Obtener la secuencia desde FASTA.
+    Secuencia* secuencia = fasta.buscarSecuencia(descripcion);
+
+    if (secuencia == nullptr) {
+        cout << "[ERROR] La secuencia '" << descripcion << "' no existe." << endl;
+        return;
+    }
+
+    vector<char> bases = secuencia->getBases();
+    int ancho = secuencia->getAncho();
+    int total = bases.size();
+
+    // Construir matriz irregular SOLO para validar coordenadas
+    int filas = (total + ancho - 1) / ancho;
+    vector<vector<char>> matriz(filas);
+    int posicion = 0;
+
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columna = 0; columna < ancho && posicion < total; columna++) {
+            matriz[fila].push_back(bases[posicion]);
+            posicion++;
+        }
+    }
+
+    // Validar coordenada inicial.
+    if (filaInicio < 0 || filaInicio >= filas || columnaInicio < 0 || columnaInicio >= matriz[filaInicio].size()) {
+        cout << "La base en la posición [" << i << " ," << j << "] no existe." << endl;
+        return;
+    }
+
+    // Validar coordenada final.
+    if (filaFin < 0 || filaFin >= filas || columnaFin < 0 || columnaFin >= matriz[filaFin].size()) {
+        cout << "La base en la posición [" << x << " ," << y << "] no existe." << endl;
+        return;
+    }
+
+    // Obtener bases inicial y final.
+    char baseInicio = matriz[filaInicio][columnaInicio];
+    char baseFin = matriz[filaFin][columnaFin];
+
+    // Obtener el grafo que ya viene construido dentro de la secuencia
+    Grafo& grafo = secuencia->getGrafo();
+
+    // Ejecutar dijkstra.
+    grafo.dijkstra(filaInicio, columnaInicio, filaFin, columnaFin);
+
+    // Obtener distancia y ruta.
+    double distancia = grafo.obtenerDistancia(filaFin, columnaFin);
+    vector<pair<int,int>> ruta = grafo.obtenerRuta(filaInicio, columnaInicio, filaFin, columnaFin);
+
+    cout << "Para la secuencia " << descripcion << ", la ruta más corta entre la base " << baseInicio
+        << " en [" << i << " ," << j << "] y la base " << baseFin << " en [" << x << " ," << y << "] es: " << endl;
+
+    // Imprimir la secuencia de bases en la ruta.
+    for (int i = 0; i < ruta.size(); i++) {
+        int rf = ruta[i].first;
+        int rc = ruta[i].second;
+        cout << matriz[rf][rc];
+
+        if (i + 1 < ruta.size()) { 
+            cout << " -> "; 
+        }
+    }
+
+    cout << endl << "El costo total de la ruta es: " << distancia << endl;
 }
+
+// Encontrar la base remota en una secuencia dada.
+void Sistema::baseRemota(const string& descripcion, const string& i, const string& j) {
+    // Convertir coordenadas a enteros.
+    int filaInicio = stoi(i);
+    int colInicio  = stoi(j);
+
+    // Obtener la secuencia desde FASTA.
+    Secuencia* secuencia = fasta.buscarSecuencia(descripcion);
+
+    if (secuencia == nullptr) {
+        cout << "La secuencia " << descripcion << " no existe." << endl;
+        return;
+    }
+
+    vector<char> bases = secuencia->getBases();
+    int ancho = secuencia->getAncho();
+    int total = bases.size();
+
+    // Construir matriz irregular.
+    int filas = (total + ancho - 1) / ancho;
+    vector<vector<char>> matriz(filas);
+    int posicion = 0;
+
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columna = 0; columna < ancho && posicion < total; columna++) {
+            matriz[fila].push_back(bases[posicion]);
+            posicion++;
+        }
+    }
+
+    // Validar coordenada inicial.
+    if (filaInicio < 0 || filaInicio >= filas || colInicio < 0 || colInicio >= matriz[filaInicio].size()) {
+        cout << "La base en la posición [" << i << " ," << j << "] no existe." << endl;
+        return;
+    }
+
+    // Encontrar todas las ocurrencias de la base objetivo.
+    char baseObjetivo = matriz[filaInicio][colInicio];
+    vector<pair<int,int>> ocurrencias;
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columna = 0; columna < matriz[fila].size(); columna++) {
+            if (matriz[fila][columna] == baseObjetivo) {
+                ocurrencias.push_back({fila, columna});
+            }
+        }
+    }
+
+    // Eliminar la ocurrencia inicial.
+    for (int i = 0; i < ocurrencias.size(); i++) {
+        if (ocurrencias[i].first == filaInicio && ocurrencias[i].second == colInicio) {
+            ocurrencias.erase(ocurrencias.begin() + i);
+            break;
+        }
+    }
+
+    // No hay otras ocurrencias.
+    if (ocurrencias.empty()) {
+        cout << "No existe otra base '" << baseObjetivo << "' diferente a la ubicada en [" << i << " ," << j << "]." << endl;
+        return;
+    }
+
+    Grafo& grafo = secuencia->getGrafo();
+    double maxDistancia = -1;
+    int rf = -1;
+    int rc = -1;
+
+    // Buscar la base remota que maximiza distancia en grafo.
+    for (int k = 0; k < ocurrencias.size(); k++) {
+
+        int f2 = ocurrencias[k].first;
+        int c2 = ocurrencias[k].second;
+
+        grafo.dijkstra(filaInicio, colInicio, f2, c2);
+        double distancia = grafo.obtenerDistancia(f2, c2);
+
+        if (distancia > maxDistancia) {
+            maxDistancia = distancia;
+            rf = f2;
+            rc = c2;
+        }
+    }
+
+    // Obtener ruta final hacia la base remota más lejana.
+    grafo.dijkstra(filaInicio, colInicio, rf, rc);
+    vector<pair<int,int>> ruta = grafo.obtenerRuta(filaInicio, colInicio, rf, rc);
+
+    // Imprimir resultados.
+    cout << "Para la secuencia " << descripcion << ", la base remota está ubicada en [" << rf << " ," << rc 
+        << "], y la ruta entre la base en [" << i << " ," << j << "] y la base remota en [" << rf << " ," << rc << "] es: " << endl;
+
+    // Imprimir la secuencia de bases en la ruta.
+    for (int i = 0; i < ruta.size(); i++) {
+        int rf = ruta[i].first;
+        int rc = ruta[i].second;
+        cout << matriz[rf][rc];
+
+        if (i + 1 < ruta.size()) { 
+            cout << " -> "; 
+        }
+    }
+
+    cout << endl << "El costo total de la ruta es: " << maxDistancia << endl;
+}
+
+
+// Devuelve una referencia al objeto que pertenece al Sistema.
+FASTA& Sistema::getFASTA() { return fasta; }

@@ -5,12 +5,15 @@
 #include <string>
 #include <vector>
 
+#include "grafo.h"
+
 using namespace std;
 
 // Clase Secuencia, representa una secuencia de bases.
 class Secuencia {
     private:
         // Atributos.
+        Grafo grafo;
         vector <char> bases;    
         string descripcion; 
         int ancho;
@@ -18,6 +21,10 @@ class Secuencia {
     public:
         // Constructor.
         Secuencia(const string& descripcion, const vector<char>& linea, int anchoLinea);
+
+        // Construir el grafo asociado a la secuencia.
+        void construirGrafo();
+        Grafo& getGrafo();
 
         // Métodos de acceso.
         string getDescripcion();

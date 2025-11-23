@@ -159,6 +159,17 @@ void FASTA::enmascararSubsecuencia(string sub) {
     }
 }
 
+// Busca una secuencia por su descripción y retorna un puntero a la misma.
+Secuencia* FASTA::buscarSecuencia(const string& descripcion) {
+    vector<Secuencia>::iterator it;
+    for (it = secuencias.begin(); it != secuencias.end(); it++) {
+        if (it->getDescripcion() == descripcion) {
+            return &(*it);
+        }
+    }
+    return nullptr;
+}
+
 // Cuenta cuántas bases distintas posibles hay en una secuencia.
 int FASTA::contarPosiblesBases(Secuencia secuencia) {
     vector<char> bases = secuencia.getBases();

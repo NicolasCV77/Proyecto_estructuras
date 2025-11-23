@@ -65,6 +65,9 @@ void Menu::imprimirMenu() {
         char* token = strtok(linea, " ");
         char* a1 = strtok(nullptr, " ");
         char* a2 = strtok(nullptr, " ");
+        char* a3 = strtok(nullptr, " ");
+        char* a4 = strtok(nullptr, " ");
+        char* a5 = strtok(nullptr, " ");
 
         if (!token) {
             continue;
@@ -74,6 +77,9 @@ void Menu::imprimirMenu() {
         string cmd(token);
         string arg1;
         string arg2;
+        string arg3;
+        string arg4;
+        string arg5;
         int argc = 0;
 
         // Convertir char a string.
@@ -87,11 +93,26 @@ void Menu::imprimirMenu() {
             argc++;
         }
 
+        if (a3 != nullptr) {
+            arg3 = string(a3);
+            argc++;
+        }
+
+        if (a4 != nullptr) {
+            arg4 = string(a4);
+            argc++;
+        }
+
+        if (a5 != nullptr) {
+            arg5 = string(a5);
+            argc++;
+        }
+
         bool encontrado = false;
         vector<Comando>:: iterator it;
 
         // Buscar en los comandos registrados.
-        for (it=comandos.begin(); it!=comandos.end(); it++) {
+        for (it = comandos.begin(); it != comandos.end(); it++) {
             if (cmd == it->getNombre()) { 
                 encontrado = true;
 
@@ -100,7 +121,7 @@ void Menu::imprimirMenu() {
                     cout << "[ERROR] Uso: " << it->getUso() << endl;
                 } else {
                     // Ejecutar el comando encontrado.
-                    it->ejecutar(arg1, arg2);
+                    it->ejecutar(arg1, arg2, arg3, arg4, arg5);
                 }
 
                 break;
@@ -115,7 +136,7 @@ void Menu::imprimirMenu() {
 }
 
 // Listar todos los comandos o uno en específico.
-void Menu::comandoAyuda(const string& arg1, const string& arg2) {
+void Menu::comandoAyuda(const string& arg1, const string& arg2, const string&, const string&, const string&) {
     // Validar argumentos.
     if (arg1.empty()) {
         cout << "Comandos disponibles: " << endl;
@@ -137,66 +158,57 @@ void Menu::comandoAyuda(const string& arg1, const string& arg2) {
 }
 
 // Cargar las secuencias al sistema.
-void Menu::comandoCargar(const string& arg1, const string& arg2) {
+void Menu::comandoCargar(const string& arg1, const string& arg2, const string&, const string&, const string&) {
     sistema.cargarArchivo(arg1);
 }
 
 // Listar el conjunto de secuencias.
-void Menu::comandoListarSecuencias(const string&, const string&) {
+void Menu::comandoListarSecuencias(const string&, const string&, const string&, const string&, const string&) {
     sistema.getFASTA().listarSecuencias();
 }
 
 // Mostrar histograma de una secuencia específica.
-void Menu::comandoHistograma(const string& arg1, const string&) {
+void Menu::comandoHistograma(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.getFASTA().histograma(arg1);
 }
 
 // Verificar si existe una subsecuencia dentro de las secuencias.
-void Menu::comandoSubsecuencia(const string& arg1, const string&) {
+void Menu::comandoSubsecuencia(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.getFASTA().contarSubsecuencia(arg1);
 }
 
 // Enmascara una subsecuencia dada en todas las secuencias.
-void Menu::comandoEnmascarar(const string& arg1, const string&) {
+void Menu::comandoEnmascarar(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.getFASTA().enmascararSubsecuencia(arg1);
 }
 
 // Guardar las secuencias actuales en un archivo FASTA.
-void Menu::comandoGuardar(const string& arg1, const string&) {
+void Menu::comandoGuardar(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.guardarArchivo(arg1);
 }
 
 // Finalizar el programa.
-void Menu::comandoSalir(const string&, const string&) {
+void Menu::comandoSalir(const string&, const string&, const string&, const string&, const string&) {
     cout << "[OK] Saliendo del programa..." << endl;
     exit(0);
 }
 
 // Exportar secuencias en un formato binario personalizado.
-void Menu::comandoCodificar(const string& arg1, const string&) {
+void Menu::comandoCodificar(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.guardarCodificacion(arg1);
 }
 
 // Importar un archivo binario al formato FASTA.
-void Menu::comandoDecodificar(const string& arg1, const string&) {
+void Menu::comandoDecodificar(const string& arg1, const string&, const string&, const string&, const string&) {
     sistema.cargarCodificacion(arg1);
 }
 
 // Encontrar la ruta más corta entre secuencias.
-void Menu::comandoRutaMasCorta(const string& arg1, const string& arg2) {
-    if (arg1.empty() || arg2.empty()) {
-        cout << "[ERROR] Uso: ruta_mas_corta descripcion_secuencia i j x y" << endl;
-        return;
-    }
-    int distancia = 0;
-    cout << "[OK] Ruta más corta entre '" << arg1 << "' y '" << arg2 << "': " << distancia << " pasos" << endl;
+void Menu::comandoRutaMasCorta(const string& arg1, const string& arg2, const string& arg3, const string& arg4, const string& arg5) {
+    sistema.rutaMasCorta(arg1, arg2, arg3, arg4, arg5);
 }
 
 // Consulta la base de una secuencia en coordenadas dadas.
-void Menu::comandoBaseRemota(const string& arg1, const string& arg2) {
-    if (arg1.empty() || arg2.empty()) {
-        cout << "[ERROR] Uso: base_remota descripcion_secuencia i j" << endl;
-        return;
-    }
-    cout << "[OK] Base remota en secuencia '" << arg1 << "' en posición (" << arg2 << ") (implementación pendiente)." << endl;
+void Menu::comandoBaseRemota(const string& arg1, const string& arg2, const string& arg3, const string&, const string&) {
+    sistema.baseRemota(arg1, arg2, arg3);
 }

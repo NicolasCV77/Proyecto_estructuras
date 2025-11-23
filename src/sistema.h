@@ -37,6 +37,10 @@ class Sistema {
         void guardarCodificacion(string nombreArchivo);
         void cargarCodificacion(string nombreArchivo);
 
+        // Operaciones con secuencias.
+        void rutaMasCorta(const string& descripcion, const string& i, const string& j, const string& x, const string& y);
+        void baseRemota(const string& descripcion, const string& i, const string& j);
+
         // Referencia del objeto FASTA.
         FASTA& getFASTA();
         

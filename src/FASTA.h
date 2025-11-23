@@ -31,6 +31,7 @@ class FASTA {
         void enmascararSubsecuencia(string sub);
 
         // Funciones de apoyo.
+        Secuencia *buscarSecuencia(const string& descripcion);
         int contarPosiblesBases(Secuencia secuencia);
         bool subEncontrada (vector <char> bases, vector <char> secuencia, int inicio);
 

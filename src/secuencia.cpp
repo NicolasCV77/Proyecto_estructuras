@@ -5,6 +5,32 @@ Secuencia::Secuencia(const string& descripcion, const vector<char>& bases, int a
     this->descripcion = descripcion;
     this->bases = bases;
     this->ancho = ancho;
+
+    // Construir el grafo asociado a la secuencia.
+    construirGrafo();
+}
+
+// Construir el grafo asociado a la secuencia.
+void Secuencia::construirGrafo() {
+    // Construcción de matriz irregular.
+    int total = bases.size();
+    int filas = (total + ancho - 1) / ancho;
+
+    vector<vector<char>> matriz(filas);
+    int posicion = 0;
+
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < ancho && posicion < total; j++) {
+            matriz[i].push_back(bases[posicion]);
+            posicion++;
+        }
+    }
+    grafo.construirGrafo(matriz);
+}
+
+// Retorna el grafo asociado a la secuencia.
+Grafo& Secuencia::getGrafo() {
+    return grafo;
 }
 
 // Retorna la descripción de la secuencia.

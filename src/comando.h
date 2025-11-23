@@ -6,7 +6,7 @@
 using namespace std;
 
 // Alias de tipo ComandoFuncion, para punteros a funciones de comandos. 
-typedef void (*ComandoFuncion)(const string&, const string&);
+typedef void (*ComandoFuncion)(const string&, const string&, const string&, const string&, const string&);
 
 // Clase Comando, representa un comando que puede ejecutarse desde el menú.
 class Comando {
@@ -29,7 +29,7 @@ class Comando {
         int getArgumentos();
 
         // Ejecutar la función asociada al comando.
-        void ejecutar(const string& arg1, const string& arg2);
+        void ejecutar(const string& arg1, const string& arg2, const string& arg3, const string& arg4, const string& arg5);
         
 };
 
